@@ -1,0 +1,7 @@
+(defun solution ()
+  (let ((num 600851475143))
+    (do ((n 2 (1+ n)))
+        ((= num 1) (1- n))
+      (do ()
+          ((/= (mod num n) 0) nil)
+        (setf num (/ num n))))))

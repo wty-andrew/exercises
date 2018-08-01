@@ -1,0 +1,7 @@
+(defun solution ()
+  (let ((sum 0))
+    (do ((n1 0 n2)
+         (n2 1 (+ n1 n2)))
+        ((>= n2 4000000) sum)
+      (if (evenp n2)
+          (incf sum n2)))))

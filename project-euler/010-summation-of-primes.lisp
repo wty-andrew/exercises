@@ -1,0 +1,6 @@
+(defun solution ()
+  (do ((known-primes '(2 3))
+       (n 5 (+ n 2)))
+      ((> n 2000000) (apply #'+ known-primes))
+    (if (every #'(lambda (prime) (/= (mod n prime) 0)) known-primes)
+        (setf known-primes (append known-primes (list n))))))

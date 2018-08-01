@@ -1,0 +1,7 @@
+(defun solution ()
+  (let ((count 0))
+    (dotimes (n 1000)
+      (if (or (zerop (mod n 3))
+              (zerop (mod n 5)))
+          (incf count n)))
+    count))

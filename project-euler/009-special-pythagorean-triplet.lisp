@@ -1,0 +1,11 @@
+(defun pythagorean-triplet-p (a b c)
+  (= (+ (expt a 2) (expt b 2)) (expt c 2)))
+
+(defun solution ()
+  (do ((c 500 (1- c)))
+      ((<= c 333) nil)
+    (do* ((b (1- c) (1- b))
+          (a (- 1000 c b) (- 1000 c b)))
+         ((> a b) nil)
+      (when (pythagorean-triplet-p a b c)
+        (return-from solution (* a b c))))))

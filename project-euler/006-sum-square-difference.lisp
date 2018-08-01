@@ -1,0 +1,6 @@
+(defun solution ()
+  (let ((square-sum (expt (/ (* (+ 1 100) 100) 2) 2))
+        (sum-squares 0))
+    (dotimes (n 100)
+      (setf sum-squares (+ sum-squares (expt (1+ n) 2))))
+    (- square-sum sum-squares)))
