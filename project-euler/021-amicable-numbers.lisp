@@ -1,0 +1,33 @@
+(defun permutation (lst)
+  (cond ((null lst) '())
+        ((null (cdr lst)) (loop for i below (1+ (car lst))
+                                collect (list i)))
+        (t (let ((result '())
+                 (n (car lst)))
+             (dotimes (i (1+ n) result)
+               (setf result (append result
+                                    (mapcar #'(lambda (l) (cons i l)) (permutation (cdr lst))))))))))
+
+(defun sum-divisors (num)
+  "return the sum of divisors not include num itself"
+  (let ((factors '())
+        (powers '()))
+    (do ((n 2 (1+ n)))
+        ((= num 1))
+      (do ((k 0 (1+ k)))
+          ((/= (mod num n) 0) (when (> k 0)
+                                (push n factors)
+                                (push k powers)))
+        (setf num (/ num n))))
+    (apply #'+ (butlast (mapcar #'(lambda (l) (apply #'* (mapcar #'(lambda (x y) (expt x y))
+                                                                 factors l)))
+                                (permutation powers))))))
+
+(defun solution ()
+  (let ((sum 0))
+    (loop for n from 2 to 10000
+          do (let ((x (sum-divisors n)))
+               (when (and (< n x 10001)
+                          (= (sum-divisors x) n))
+                 (incf sum (+ x n)))))
+    sum))
