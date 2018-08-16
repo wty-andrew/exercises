@@ -1,0 +1,5 @@
+(defun solution ()
+  (do ((index 1 (1+ index))
+       (n1 0 n2)
+       (n2 1 (+ n1 n2)))
+      ((>= n2 (expt 10 999)) index)))
