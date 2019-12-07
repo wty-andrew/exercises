@@ -4,13 +4,18 @@
                        `((chain window ,arg) ,arg))
                    args)))
 
-(defun main ()
-  (let* ((canvas (chain document (get-element-by-id "canvas")))
-         (ctx (chain canvas (get-context "2d")))
-         (width (@ window inner-width))
-         (height (@ window inner-height)))
-    (setf (@ canvas width) width
-          (@ canvas height) height)
+(defmacro with-canvas (() &body body) ; empty arg to make the indentation work
+  `(let* ((canvas (chain document (get-element-by-id "canvas")))
+          (ctx (chain canvas (get-context "2d")))
+          (width (@ window inner-width))
+          (height (@ window inner-height)))
+     (setf (@ canvas width) width
+           (@ canvas height) height)
+     ,@body))
+
+(defun ep-1 ()
+  "Introduction"
+  (with-canvas ()
     (dotimes (_ 100)
       (chain ctx (begin-path))
       (chain ctx (move-to (* (random) width)
@@ -19,4 +24,38 @@
                           (* (random) height)))
       (chain ctx (stroke)))))
 
-(setf (chain window onload) main)
+(defun ep-2 ()
+  "Intro to Trigonometry"
+  (with-canvas ()
+    (chain ctx (translate 0 (/ height 2)))
+    (chain ctx (scale 1 -1))
+    (do ((angle 0 (+ angle 0.01)))
+        ((>= angle (* pi 2)))
+      (chain ctx (fill-rect (* angle (/ width (* 2 pi))) (* (sin angle) (/ width (* 2 pi))) 5 5)))))
+
+(defun ep-3 ()
+  "More Trigonometry"
+  (with-canvas ()
+    (let ((center-y (* height 0.5))
+          (center-x (* width 0.5))
+          (base-radius 50)
+          (base-alpha 0.5)
+          (offset-height (* height 0.4))
+          (offset-radius 30)
+          (offset-alpha 0.5)
+          (speed 0.1)
+          (angle 0))
+      (labels ((render ()
+                 (setf y (+ center-y (* (sin angle) offset-height))
+                       radius (+ base-radius (* (sin (/ angle 2)) offset-radius))
+                       alpha (+ base-alpha (* (sin (/ angle 2)) offset-alpha))
+                       (@ ctx fill-style) (concatenate 'string "rgba(0, 0, 0, " alpha ")"))
+                 (chain ctx (clear-rect 0 0 width height))
+                 (chain ctx (begin-path))
+                 (chain ctx (arc center-x y radius 0 (* pi 2) false))
+                 (chain ctx (fill))
+                 (incf angle speed)
+                 (request-animation-frame render)))
+        (render)))))
+
+(setf (chain window onload) ep-3)
