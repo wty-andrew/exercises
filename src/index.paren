@@ -4,7 +4,19 @@
                        `((chain window ,arg) ,arg))
                    args)))
 
-(defun greet ()
-  (chain console (log "hello world")))
+(defun main ()
+  (let* ((canvas (chain document (get-element-by-id "canvas")))
+         (ctx (chain canvas (get-context "2d")))
+         (width (@ window inner-width))
+         (height (@ window inner-height)))
+    (setf (@ canvas width) width
+          (@ canvas height) height)
+    (dotimes (_ 100)
+      (chain ctx (begin-path))
+      (chain ctx (move-to (* (random) width)
+                          (* (random) height)))
+      (chain ctx (line-to (* (random) width)
+                          (* (random) height)))
+      (chain ctx (stroke)))))
 
-(exports greet)
+(setf (chain window onload) main)

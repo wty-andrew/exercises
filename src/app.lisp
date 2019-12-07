@@ -24,4 +24,5 @@
      (:head
       (:meta :charset "utf-8")
       (:link :type "text/css" :rel "stylesheet" :href "/main.css"))
-     (:body (:script :type "text/javascript" :src "http://localhost:3000/bundle.js")))))
+     (:body (:canvas :id "canvas")
+            (:script :type "text/javascript" :src "http://localhost:3000/bundle.js")))))
