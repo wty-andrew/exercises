@@ -1,0 +1,10 @@
+(defmacro exports (&rest args)
+  "Make args available in global scope."
+  `(setf ,@(mapcan #'(lambda (arg)
+                       `((chain window ,arg) ,arg))
+                   args)))
+
+(defun greet ()
+  (chain console (log "hello world")))
+
+(exports greet)
