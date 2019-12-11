@@ -1,9 +1,3 @@
-(defmacro exports (&rest args)
-  "Make args available in global scope."
-  `(setf ,@(mapcan #'(lambda (arg)
-                       `((chain window ,arg) ,arg))
-                   args)))
-
 (defvar *canvas* (chain document (get-element-by-id "canvas")))
 (defvar *ctx* (chain *canvas* (get-context "2d")))
 (defvar *width* (@ window inner-width))
@@ -13,6 +7,14 @@
 (var width *width*)
 (var height *height*)
 
+;; utils
+(defmacro exports (&rest args)
+  "Make args available in global scope."
+  `(setf ,@(mapcan #'(lambda (arg)
+                       `((chain window ,arg) ,arg))
+                   args)))
+
+;; canvas
 (defmacro ctx (fn &rest args)
   `(chain *ctx* (,fn ,@args)))
 
@@ -27,6 +29,70 @@
      (ctx save)
      ,@body
      (ctx restore)))
+
+;; vector
+(defun make-vector (&optional (x 0) (y 0))
+  (create x x y y))
+
+(defmacro vec-x (vec)
+  `(@ ,vec x))
+
+(defsetf vec-x (vec) (value)
+  `(setf (@ ,vec x) ,value))
+
+(defmacro vec-y (vec)
+  `(@ ,vec y))
+
+(defsetf vec-y (vec) (value)
+  `(setf (@ ,vec y) ,value))
+
+(defun vec-angle (vec)
+  (chain *math (atan2 (vec-y vec) (vec-x vec))))
+
+(defsetf vec-angle (vec) (angle)
+  `(let ((length (vec-length ,vec)))
+     (setf (vec-x ,vec) (* (cos ,angle) length)
+           (vec-y ,vec) (* (sin ,angle) length))))
+
+(defun vec-length (vec)
+  (sqrt (+ (* (vec-x vec) (vec-x vec))
+           (* (vec-y vec) (vec-y vec)))))
+
+(defsetf vec-length (vec) (length)
+  `(let ((angle (vec-angle ,vec)))
+     (setf (vec-x ,vec) (* (cos angle) ,length)
+           (vec-y ,vec) (* (sin angle) ,length))))
+
+(defun v+ (v1 v2)
+  (make-vector (+ (vec-x v1) (vec-x v2))
+               (+ (vec-y v1) (vec-y v2))))
+
+(defun v- (v1 v2)
+  (make-vector (- (vec-x v1) (vec-x v2))
+               (- (vec-y v1) (vec-y v2))))
+
+(defun v* (v scalar)
+  (make-vector (* (vec-x v) scalar)
+               (* (vec-y v) scalar)))
+
+(defun v/ (v scalar)
+  (v* v (/ 1 scalar)))
+
+(defun v+! (v1 v2)
+  (incf (vec-x v1) (vec-x v2))
+  (incf (vec-y v1) (vec-y v2)))
+
+(defun v-! (v1 v2)
+  (decf (vec-x v1) (vec-x v2))
+  (decf (vec-y v1) (vec-y v2)))
+
+(defun v*! (v scalar)
+  (setf (vec-x v) (* (vec-x v) scalar)
+        (vec-y v) (* (vec-y v) scalar)))
+
+(defun v/! (v scalar)
+  (v*! v (/ 1 scalar)))
+
 
 (defun ep-1 ()
   "Introduction"
@@ -131,4 +197,35 @@
                                       angle (chain *math (atan2 dy dx))))))
       (render))))
 
-(setf (@ window onload) ep-5)
+(defun ep-6 ()
+  "Vectors, Part I")
+
+(defun ep-7 ()
+  "Vectors, Part II"
+  (setf v (make-vector 10 5))
+  (chain console (log (vec-x v)))
+  (chain console (log (vec-y v)))
+  (chain console (log (vec-angle v)))
+  (chain console (log (vec-length v)))
+  (setf (vec-angle v) (/ pi 6))
+  (setf (vec-length v) 100)
+  (chain console (log (vec-x v)))
+  (chain console (log (vec-y v)))
+
+  (setf v1 (make-vector 10 5)
+        v2 (make-vector 3 4)
+        v3 (v+ v1 v2))
+  (chain console (log (vec-x v3)))
+  (chain console (log (vec-y v3)))
+
+  (setf v1 (make-vector 10 5)
+        v2 (v* v1 2))
+  (chain console (log (vec-length v1)))
+  (chain console (log (vec-length v2)))
+
+  (setf v1 (make-vector 10 5)
+        v2 (make-vector 3 4))
+  (v+! v1 v2)
+  (chain console (log (vec-x v1) (vec-y v1))))
+
+(setf (@ window onload) ep-7)

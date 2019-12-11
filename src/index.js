@@ -14,6 +14,58 @@ CANVAS.width = WIDTH;
 CANVAS.height = HEIGHT;
 var width = WIDTH;
 var height = HEIGHT;
+function makeVector(x, y) {
+    if (x === undefined) {
+        x = 0;
+    };
+    if (y === undefined) {
+        y = 0;
+    };
+    return { x : x, y : y };
+};
+function vecAngle(vec) {
+    return Math.atan2(vec.y, vec.x);
+};
+function vecLength(vec) {
+    __PS_MV_REG = [];
+    return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+};
+function vplus(v1, v2) {
+    __PS_MV_REG = [];
+    return makeVector(v1.x + v2.x, v1.y + v2.y);
+};
+function v(v1, v2) {
+    __PS_MV_REG = [];
+    return makeVector(v1.x - v2.x, v1.y - v2.y);
+};
+function vstar(v, scalar) {
+    __PS_MV_REG = [];
+    return makeVector(v.x * scalar, v.y * scalar);
+};
+function vslash(v, scalar) {
+    __PS_MV_REG = [];
+    return vstar(v, 1 / scalar);
+};
+function vplusbang(v1, v2) {
+    v1.x += v2.x;
+    return v1.y += v2.y;
+};
+function vbang(v1, v2) {
+    v1.x -= v2.x;
+    return v1.y -= v2.y;
+};
+function vstarbang(v, scalar) {
+    var _js2 = v;
+    var _js1 = v.x * scalar;
+    _js2.x = _js1;
+    var _js4 = v;
+    var _js3 = v.y * scalar;
+    return _js4.y = _js3;
+};
+function vslashbang(v, scalar) {
+    __PS_MV_REG = [];
+    return vstarbang(v, 1 / scalar);
+};
 /** Introduction */
 function ep1() {
     for (var _ = 0; _ < 100; _ += 1) {
@@ -30,8 +82,8 @@ function ep2() {
     var angle = 0;
     for (; angle < Math.PI * 2; ) {
         CTX.fillRect(angle * (width / (2 * Math.PI)), Math.sin(angle) * (width / (2 * Math.PI)), 5, 5);
-        var _js19 = angle + 0.01;
-        angle = _js19;
+        var _js5 = angle + 0.01;
+        angle = _js5;
     };
 };
 /** More Trigonometry */
@@ -130,4 +182,49 @@ function ep5() {
     __PS_MV_REG = [];
     return render();
 };
-window.onload = ep5;
+function ep6() {
+    return 'Vectors, Part I';
+};
+/** Vectors, Part II */
+function ep7() {
+    v = makeVector(10, 5);
+    console.log(v.x);
+    console.log(v.y);
+    console.log(vecAngle(v));
+    console.log(vecLength(v));
+    var _js6 = v;
+    var _js5 = Math.PI / 6;
+    var length = vecLength(_js6);
+    var _js8 = _js6;
+    var _js7 = Math.cos(_js5) * length;
+    _js8.x = _js7;
+    var _js10 = _js6;
+    var _js9 = Math.sin(_js5) * length;
+    _js10.y = _js9;
+    var _js12 = v;
+    var _js11 = 100;
+    var angle = vecAngle(_js12);
+    var _js14 = _js12;
+    var _js13 = Math.cos(angle) * _js11;
+    _js14.x = _js13;
+    var _js16 = _js12;
+    var _js15 = Math.sin(angle) * _js11;
+    _js16.y = _js15;
+    console.log(v.x);
+    console.log(v.y);
+    v1 = makeVector(10, 5);
+    v2 = makeVector(3, 4);
+    v3 = vplus(v1, v2);
+    console.log(v3.x);
+    console.log(v3.y);
+    v1 = makeVector(10, 5);
+    v2 = vstar(v1, 2);
+    console.log(vecLength(v1));
+    console.log(vecLength(v2));
+    v1 = makeVector(10, 5);
+    v2 = makeVector(3, 4);
+    vplusbang(v1, v2);
+    __PS_MV_REG = [];
+    return console.log(v1.x, v1.y);
+};
+window.onload = ep7;
