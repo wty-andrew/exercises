@@ -30,6 +30,12 @@
      ,@body
      (ctx restore)))
 
+(defmacro def-animation-loop (name &body body)
+  `(defun ,name ()
+     (clear)
+     ,@body
+     (request-animation-frame ,name)))
+
 ;; vector
 (defun make-vector (&optional (x 0) (y 0))
   (create x x y y))
@@ -93,6 +99,19 @@
 (defun v/! (v scalar)
   (v*! v (/ 1 scalar)))
 
+;; particle
+(defun make-particle (x y speed direction &optional (gravity 0))
+  (let ((position (make-vector x y))
+        (velocity (make-vector 0 0)))
+    (setf (vec-length velocity) speed
+          (vec-angle velocity) direction)
+    (create position position
+            velocity velocity
+            gravity (make-vector 0 gravity)
+            update #'(lambda ()
+                       (v+! (@ this velocity) (@ this gravity))
+                       (v+! (@ this position) (@ this velocity)))
+            accelerate #'(lambda (accel) (v+! (@ this velocity) accel)))))
 
 (defun ep-1 ()
   "Introduction"
@@ -121,18 +140,17 @@
         (offset-alpha 0.5)
         (speed 0.1)
         (angle 0))
-    (labels ((render ()
-               (setf y (+ center-y (* (sin angle) offset-height))
-                     radius (+ base-radius (* (sin (/ angle 2)) offset-radius))
-                     alpha (+ base-alpha (* (sin (/ angle 2)) offset-alpha))
-                     (ctx-get fill-style) (concatenate 'string "rgba(0, 0, 0, " alpha ")"))
-               (clear)
-               (ctx begin-path)
-               (ctx arc center-x y radius 0 (* pi 2) false)
-               (ctx fill)
-               (incf angle speed)
-               (request-animation-frame render)))
-      (render))))
+    (def-animation-loop render
+      (setf y (+ center-y (* (sin angle) offset-height))
+            radius (+ base-radius (* (sin (/ angle 2)) offset-radius))
+            alpha (+ base-alpha (* (sin (/ angle 2)) offset-alpha))
+            (ctx-get fill-style) (concatenate 'string "rgba(0, 0, 0, " alpha ")"))
+      (clear)
+      (ctx begin-path)
+      (ctx arc center-x y radius 0 (* pi 2) false)
+      (ctx fill)
+      (incf angle speed))
+    (render)))
 
 (defun ep-4 ()
   "Circles, Ellipses and Lissajous Curves"
@@ -145,17 +163,15 @@
         (x-speed 0.1)
         (y-speed 0.131)
         x y)
-    (labels ((render ()
-               (clear)
-               (setf x (+ center-x (* (cos x-angle) x-radius))
-                     y (+ center-y (* (sin y-angle) y-radius)))
-               (ctx begin-path)
-               (ctx arc x y 10 0 (* pi 2) false)
-               (ctx fill)
-               (incf x-angle x-speed)
-               (incf y-angle y-speed)
-               (request-animation-frame render)))
-      (render))))
+    (def-animation-loop render
+      (setf x (+ center-x (* (cos x-angle) x-radius))
+            y (+ center-y (* (sin y-angle) y-radius)))
+      (ctx begin-path)
+      (ctx arc x y 10 0 (* pi 2) false)
+      (ctx fill)
+      (incf x-angle x-speed)
+      (incf y-angle y-speed))
+    (render)))
 
 
 (defun ep-5 ()
@@ -171,31 +187,29 @@
         dx
         dy
         (angle 0))
-    (labels ((render ()
-               (clear)
-               (setf arrow-x (+ center-x (* (cos x-angle) (/ width 6)))
-                     arrow-y (+ center-y (* (sin y-angle) (/ height 3))))
-               (with-context ()
-                 (ctx translate arrow-x arrow-y)
-                 (ctx rotate angle)
-                 (ctx begin-path)
-                 (ctx move-to 20 0)
-                 (ctx line-to -20 0)
-                 (ctx move-to 20 0)
-                 (ctx line-to 10 -10)
-                 (ctx move-to 20 0)
-                 (ctx line-to 10 10)
-                 (ctx stroke))
-               (incf x-angle x-speed)
-               (incf y-angle y-speed)
-               (request-animation-frame render)))
-      (chain document body (add-event-listener
-                            "mousemove"
-                            #'(lambda (evt)
-                                (setf dx (- (@ evt client-x) arrow-x)
-                                      dy (- (@ evt client-y) arrow-y)
-                                      angle (chain *math (atan2 dy dx))))))
-      (render))))
+    (def-animation-loop render
+      (setf arrow-x (+ center-x (* (cos x-angle) (/ width 6)))
+            arrow-y (+ center-y (* (sin y-angle) (/ height 3))))
+      (with-context ()
+        (ctx translate arrow-x arrow-y)
+        (ctx rotate angle)
+        (ctx begin-path)
+        (ctx move-to 20 0)
+        (ctx line-to -20 0)
+        (ctx move-to 20 0)
+        (ctx line-to 10 -10)
+        (ctx move-to 20 0)
+        (ctx line-to 10 10)
+        (ctx stroke))
+      (incf x-angle x-speed)
+      (incf y-angle y-speed))
+    (chain document body (add-event-listener
+                          "mousemove"
+                          #'(lambda (evt)
+                              (setf dx (- (@ evt client-x) arrow-x)
+                                    dy (- (@ evt client-y) arrow-y)
+                                    angle (chain *math (atan2 dy dx))))))
+    (render)))
 
 (defun ep-6 ()
   "Vectors, Part I")
@@ -228,4 +242,39 @@
   (v+! v1 v2)
   (chain console (log (vec-x v1) (vec-y v1))))
 
-(setf (@ window onload) ep-7)
+(defun ep-8 ()
+  "Velocity"
+  (let* ((num-particles 100)
+         (particles (loop repeat num-particles
+                          collect (make-particle
+                                   (/ width 2)
+                                   (/ height 2)
+                                   (1+ (* (random) 4))
+                                   (1+ (* (random) pi 2))))))
+    (def-animation-loop update
+      (dolist (p particles)
+        (chain p (update))
+        (ctx begin-path)
+        (ctx arc (vec-x (@ p position)) (vec-y (@ p position)) 10 0 (* pi 2) false)
+        (ctx fill)))
+    (update)))
+
+(defun ep-9 ()
+  "Acceleration"
+  (let* ((num-particles 100)
+         (particles (loop repeat num-particles
+                          collect (make-particle
+                                   (/ width 2)
+                                   (/ height 3)
+                                   (+ (* (random) 5) 2)
+                                   (1+ (* (random) pi 2))
+                                   0.1))))
+    (def-animation-loop update
+      (dolist (p particles)
+        (chain p (update))
+        (ctx begin-path)
+        (ctx arc (vec-x (@ p position)) (vec-y (@ p position)) 4 0 (* pi 2) false)
+        (ctx fill)))
+    (update)))
+
+(setf (@ window onload) ep-9)

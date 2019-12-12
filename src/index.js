@@ -55,16 +55,55 @@ function vbang(v1, v2) {
     return v1.y -= v2.y;
 };
 function vstarbang(v, scalar) {
-    var _js2 = v;
-    var _js1 = v.x * scalar;
-    _js2.x = _js1;
-    var _js4 = v;
-    var _js3 = v.y * scalar;
-    return _js4.y = _js3;
+    var _js1236 = v;
+    var _js1235 = v.x * scalar;
+    _js1236.x = _js1235;
+    var _js1238 = v;
+    var _js1237 = v.y * scalar;
+    return _js1238.y = _js1237;
 };
 function vslashbang(v, scalar) {
     __PS_MV_REG = [];
     return vstarbang(v, 1 / scalar);
+};
+function makeParticle(x, y, speed, direction, gravity) {
+    if (gravity === undefined) {
+        gravity = 0;
+    };
+    var position = makeVector(x, y);
+    var velocity = makeVector(0, 0);
+    var _js1240 = velocity;
+    var _js1239 = speed;
+    var angle = vecAngle(_js1240);
+    var _js1244 = _js1240;
+    var _js1243 = Math.cos(angle) * _js1239;
+    _js1244.x = _js1243;
+    var _js1246 = _js1240;
+    var _js1245 = Math.sin(angle) * _js1239;
+    _js1246.y = _js1245;
+    var _js1242 = velocity;
+    var _js1241 = direction;
+    var length = vecLength(_js1242);
+    var _js1248 = _js1242;
+    var _js1247 = Math.cos(_js1241) * length;
+    _js1248.x = _js1247;
+    var _js1250 = _js1242;
+    var _js1249 = Math.sin(_js1241) * length;
+    _js1250.y = _js1249;
+    __PS_MV_REG = [];
+    return { position : position,
+             velocity : velocity,
+             gravity : makeVector(0, gravity),
+             update : function () {
+        vplusbang(this.velocity, this.gravity);
+        __PS_MV_REG = [];
+        return vplusbang(this.position, this.velocity);
+    },
+             accelerate : function (accel) {
+        __PS_MV_REG = [];
+        return vplusbang(this.velocity, accel);
+    }
+           };
 };
 /** Introduction */
 function ep1() {
@@ -82,8 +121,8 @@ function ep2() {
     var angle = 0;
     for (; angle < Math.PI * 2; ) {
         CTX.fillRect(angle * (width / (2 * Math.PI)), Math.sin(angle) * (width / (2 * Math.PI)), 5, 5);
-        var _js5 = angle + 0.01;
-        angle = _js5;
+        var _js1251 = angle + 0.01;
+        angle = _js1251;
     };
 };
 /** More Trigonometry */
@@ -97,7 +136,8 @@ function ep3() {
     var offsetAlpha = 0.5;
     var speed = 0.1;
     var angle = 0;
-    var render = function () {
+    function render() {
+        CTX.clearRect(0, 0, WIDTH, HEIGHT);
         y = centerY + Math.sin(angle) * offsetHeight;
         radius = baseRadius + Math.sin(angle / 2) * offsetRadius;
         alpha = baseAlpha + Math.sin(angle / 2) * offsetAlpha;
@@ -125,7 +165,7 @@ function ep4() {
     var ySpeed = 0.131;
     var x = null;
     var y = null;
-    var render = function () {
+    function render() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
         x = centerX + Math.cos(xAngle) * xRadius;
         y = centerY + Math.sin(yAngle) * yRadius;
@@ -153,7 +193,7 @@ function ep5() {
     var dx = null;
     var dy = null;
     var angle = 0;
-    var render = function () {
+    function render() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
         arrowX = centerX + Math.cos(xAngle) * (width / 6);
         arrowY = centerY + Math.sin(yAngle) * (height / 3);
@@ -192,24 +232,24 @@ function ep7() {
     console.log(v.y);
     console.log(vecAngle(v));
     console.log(vecLength(v));
-    var _js6 = v;
-    var _js5 = Math.PI / 6;
-    var length = vecLength(_js6);
-    var _js8 = _js6;
-    var _js7 = Math.cos(_js5) * length;
-    _js8.x = _js7;
-    var _js10 = _js6;
-    var _js9 = Math.sin(_js5) * length;
-    _js10.y = _js9;
-    var _js12 = v;
-    var _js11 = 100;
-    var angle = vecAngle(_js12);
-    var _js14 = _js12;
-    var _js13 = Math.cos(angle) * _js11;
-    _js14.x = _js13;
-    var _js16 = _js12;
-    var _js15 = Math.sin(angle) * _js11;
-    _js16.y = _js15;
+    var _js1252 = v;
+    var _js1251 = Math.PI / 6;
+    var length = vecLength(_js1252);
+    var _js1254 = _js1252;
+    var _js1253 = Math.cos(_js1251) * length;
+    _js1254.x = _js1253;
+    var _js1256 = _js1252;
+    var _js1255 = Math.sin(_js1251) * length;
+    _js1256.y = _js1255;
+    var _js1258 = v;
+    var _js1257 = 100;
+    var angle = vecAngle(_js1258);
+    var _js1260 = _js1258;
+    var _js1259 = Math.cos(angle) * _js1257;
+    _js1260.x = _js1259;
+    var _js1262 = _js1258;
+    var _js1261 = Math.sin(angle) * _js1257;
+    _js1262.y = _js1261;
     console.log(v.x);
     console.log(v.y);
     v1 = makeVector(10, 5);
@@ -227,4 +267,56 @@ function ep7() {
     __PS_MV_REG = [];
     return console.log(v1.x, v1.y);
 };
-window.onload = ep7;
+/** Velocity */
+function ep8() {
+    var numParticles = 100;
+    var particles = (function () {
+        var collect1264 = [];
+        for (var _js1263 = 0; _js1263 < numParticles; _js1263 += 1) {
+            collect1264.push(makeParticle(width / 2, height / 2, Math.random() * 4 + 1, Math.random() * Math.PI * 2 + 1));
+        };
+        __PS_MV_REG = [];
+        return collect1264;
+    })();
+    function update() {
+        CTX.clearRect(0, 0, WIDTH, HEIGHT);
+        for (var p = null, _js_idx1265 = 0; _js_idx1265 < particles.length; _js_idx1265 += 1) {
+            p = particles[_js_idx1265];
+            p.update();
+            CTX.beginPath();
+            CTX.arc(p.position.x, p.position.y, 10, 0, Math.PI * 2, false);
+            CTX.fill();
+        };
+        __PS_MV_REG = [];
+        return requestAnimationFrame(update);
+    };
+    __PS_MV_REG = [];
+    return update();
+};
+/** Acceleration */
+function ep9() {
+    var numParticles = 100;
+    var particles = (function () {
+        var collect1267 = [];
+        for (var _js1266 = 0; _js1266 < numParticles; _js1266 += 1) {
+            collect1267.push(makeParticle(width / 2, height / 3, Math.random() * 5 + 2, Math.random() * Math.PI * 2 + 1, 0.1));
+        };
+        __PS_MV_REG = [];
+        return collect1267;
+    })();
+    function update() {
+        CTX.clearRect(0, 0, WIDTH, HEIGHT);
+        for (var p = null, _js_idx1268 = 0; _js_idx1268 < particles.length; _js_idx1268 += 1) {
+            p = particles[_js_idx1268];
+            p.update();
+            CTX.beginPath();
+            CTX.arc(p.position.x, p.position.y, 4, 0, Math.PI * 2, false);
+            CTX.fill();
+        };
+        __PS_MV_REG = [];
+        return requestAnimationFrame(update);
+    };
+    __PS_MV_REG = [];
+    return update();
+};
+window.onload = ep9;
