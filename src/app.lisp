@@ -25,4 +25,6 @@
       (:meta :charset "utf-8")
       (:link :type "text/css" :rel "stylesheet" :href "/main.css"))
      (:body (:canvas :id "canvas")
-            (:script :type "text/javascript" :src "http://localhost:3000/bundle.js")))))
+            (:script :type "text/javascript" :src "http://localhost:3000/vector.js")
+            (:script :type "text/javascript" :src "http://localhost:3000/particle.js")
+            (:script :type "text/javascript" :src "http://localhost:3000/index.js")))))

@@ -1,0 +1,57 @@
+(defun make-particle (x y speed direction &optional (gravity 0))
+  (let ((position (make-vector x y))
+        (velocity (make-vector 0 0)))
+    (setf (vec-length velocity) speed
+          (vec-angle velocity) direction)
+    (create position position
+            velocity velocity
+            mass 1
+            radius 0
+            bounce -1
+            gravity (make-vector 0 gravity))))
+
+(defmacro particle-pos (p)
+  `(@ ,p position))
+
+(defmacro particle-vel (p)
+  `(@ ,p velocity))
+
+(defmacro particle-x (p)
+  `(vec-x (particle-pos ,p)))
+
+(defsetf particle-x (p) (value)
+  `(setf (vec-x (particle-pos ,p)) ,value))
+
+(defmacro particle-y (p)
+  `(vec-y (particle-pos ,p)))
+
+(defsetf particle-y (p) (value)
+  `(setf (vec-y (particle-pos ,p)) ,value))
+
+(defmacro particle-mass (p)
+  `(@ ,p mass))
+
+(defmacro particle-radius (p)
+  `(@ ,p radius))
+
+(defmacro particle-bounce (p)
+  `(@ ,p bounce))
+
+(defmacro particle-grav (p)
+  `(@ ,p gravity))
+
+(defun particle-update! (p)
+  (v+! (particle-vel p) (particle-grav p))
+  (v+! (particle-pos p) (particle-vel p)))
+
+(defun particle-accelerate! (p accel)
+  (v+! (particle-vel p) accel))
+
+(defun particle-gravitate-to! (p1 p2)
+  (let ((grav (make-vector 0 0))
+        (dist (distance (particle-pos p1) (particle-pos p2))))
+    (setf (vec-length grav) (/ (particle-mass p2) (* dist dist))
+          (vec-angle grav) (angle-between (particle-pos p1) (particle-pos p2)))
+    (v+! (particle-vel p1) grav)))
+
+(exports make-particle particle-update! particle-accelerate! particle-gravitate-to!)

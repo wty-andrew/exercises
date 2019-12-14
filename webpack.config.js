@@ -1,10 +1,14 @@
 const path = require('path')
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    vector: './src/vector.js',
+    particle: './src/particle.js',
+    index: './src/index.js',
+  },
   output: {
     path: __dirname,
-    filename: './bundle.js'
+    filename: './[name].js'
   },
 
   // module: {

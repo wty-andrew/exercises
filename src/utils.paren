@@ -1,0 +1,27 @@
+(defmacro exports (&rest args)
+  "Make args available in global scope."
+  `(setf ,@(mapcan #'(lambda (arg)
+                       `((chain window ,arg) ,arg))
+                   args)))
+
+;; canvas
+(defmacro ctx (fn &rest args)
+  `(chain *ctx* (,fn ,@args)))
+
+(defmacro ctx-get (attr)
+  `(@ *ctx* ,attr))
+
+(defmacro clear ()
+  `(ctx clear-rect 0 0 *width* *height*))
+
+(defmacro with-context (&body body)
+  `(progn
+     (ctx save)
+     ,@body
+     (ctx restore)))
+
+(defmacro def-animation-loop (name &body body)
+  `(defun ,name ()
+     (clear)
+     ,@body
+     (request-animation-frame ,name)))
