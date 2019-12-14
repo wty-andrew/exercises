@@ -100,7 +100,7 @@
   (v*! v (/ 1 scalar)))
 
 ;; particle
-(defun make-particle (x y speed direction &optional (gravity 0) (mass 1))
+(defun make-particle (x y speed direction &optional (gravity 0) (mass 1) (radius 0))
   (let ((position (make-vector x y))
         (velocity (make-vector 0 0)))
     (setf (vec-length velocity) speed
@@ -108,6 +108,8 @@
     (create position position
             velocity velocity
             mass mass
+            radius radius
+            bounce -1
             gravity (make-vector 0 gravity)
             update #'(lambda ()
                        (v+! (@ this velocity) (@ this gravity))
@@ -362,4 +364,72 @@
       (ctx fill))
     (update)))
 
-(setf (@ window onload) ep-11)
+(defun ep-12 ()
+  "Edge Handling"
+  (let* ((num-particles 100)
+         (particles
+           (loop repeat num-particles
+                 collect (let ((particle (make-particle
+                                          (/ width 2) height
+                                          (+ (* (random) 8) 5) (+ (/ pi -2) (- (* (random) 0.2) 0.1))
+                                          0.1 1 (+ (* (random) 10) 2))))
+                           (setf (@ particle bounce) -0.9)
+                           particle))))
+
+    (defun wrap (p)
+      (when (> (- (vec-x (@ p position)) (@ p radius)) width)
+        (setf (vec-x (@ p position)) (- (@ p radius))))
+      (when (< (+ (vec-x (@ p position)) (@ p radius)) 0)
+        (setf (vec-x (@ p position)) (+ width (@ p radius))))
+      (when (> (- (vec-y (@ p position)) (@ p radius)) height)
+        (setf (vec-y (@ p position)) (- (@ p radius))))
+      (when (< (+ (vec-y (@ p position)) (@ p radius)) 0)
+        (setf (vec-y (@ p position)) (+ height (@ p radius)))))
+
+    (defun remove-dead-particles (particles)
+      (do ((i (1- (@ particles length)) (1- i)))
+          ((< i 0))
+        (let ((p (aref particles i)))
+          (when (or (> (- (vec-x (@ p position)) (@ p radius)) width)
+                    (< (+ (vec-x (@ p position)) (@ p radius)) 0)
+                    (> (- (vec-y (@ p position)) (@ p radius)) height)
+                    (< (+ (vec-y (@ p position)) (@ p radius)) 0))
+            (chain particles (splice i 1))))))
+
+    (defun regenerate (p)
+      (when (> (- (vec-y (@ p position)) (@ p radius)) height)
+        (setf (vec-x (@ p position)) (/ width 2)
+              (vec-y (@ p position)) height
+              (vec-length (@ p velocity)) (+ (* (random) 8) 5)
+              (vec-angle (@ p velocity)) (+ (/ pi -2) (- (* (random) 0.2) 0.1)))))
+
+    (defun bounce (p)
+      (when (> (+ (vec-x (@ p position)) (@ p radius)) width)
+        (setf (vec-x (@ p position)) (- width (@ p radius))
+              (vec-x (@ p velocity)) (* (vec-x (@ p velocity)) (@ p bounce))))
+      (when (< (- (vec-x (@ p position)) (@ p radius)) 0)
+        (setf (vec-x (@ p position)) (@ p radius)
+              (vec-x (@ p velocity)) (* (vec-x (@ p velocity)) (@ p bounce))))
+      (when (> (+ (vec-y (@ p position)) (@ p radius)) height)
+        (setf (vec-y (@ p position)) (- height (@ p radius))
+              (vec-y (@ p velocity)) (* (vec-y (@ p velocity)) (@ p bounce))))
+      (when (< (- (vec-y (@ p position)) (@ p radius)) 0)
+        (setf (vec-y (@ p position)) (@ p radius)
+              (vec-y (@ p velocity)) (* (vec-y (@ p velocity)) (@ p bounce)))))
+
+    (def-animation-loop update ()
+      (dolist (p particles)
+        (chain p (update))
+        (ctx begin-path)
+        (ctx arc (vec-x (@ p position)) (vec-y (@ p position)) (@ p radius) 0 (* pi 2) false)
+        (ctx fill)
+        ;; (wrap p)
+        ;; (regenerate p)
+        (bounce p)
+        )
+      ;; (chain (remove-dead-particles particles))) ; removal
+      )
+    (update)))
+
+
+(setf (@ window onload) ep-12)
