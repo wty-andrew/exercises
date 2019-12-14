@@ -61,8 +61,8 @@
            (vec-y ,vec) (* (sin ,angle) length))))
 
 (defun vec-length (vec)
-  (sqrt (+ (* (vec-x vec) (vec-x vec))
-           (* (vec-y vec) (vec-y vec)))))
+  (with-slots (x y) vec
+    (sqrt (+ (* x x) (* y y)))))
 
 (defsetf vec-length (vec) (length)
   `(let ((angle (vec-angle ,vec)))
@@ -99,36 +99,71 @@
 (defun v/! (v scalar)
   (v*! v (/ 1 scalar)))
 
+(defun distance (v1 v2)
+  (let ((dx (- (vec-x v2) (vec-x v1)))
+        (dy (- (vec-y v2) (vec-y v1))))
+    (sqrt (+ (* dx dx) (* dy dy)))))
+
+(defun angle-between (v1 v2)
+  (chain *math (atan2 (- (vec-y v2) (vec-y v1))
+                      (- (vec-x v2) (vec-x v1)))))
+
 ;; particle
-(defun make-particle (x y speed direction &optional (gravity 0) (mass 1) (radius 0))
+(defun make-particle (x y speed direction &optional (gravity 0))
   (let ((position (make-vector x y))
         (velocity (make-vector 0 0)))
     (setf (vec-length velocity) speed
           (vec-angle velocity) direction)
     (create position position
             velocity velocity
-            mass mass
-            radius radius
+            mass 1
+            radius 0
             bounce -1
-            gravity (make-vector 0 gravity)
-            update #'(lambda ()
-                       (v+! (@ this velocity) (@ this gravity))
-                       (v+! (@ this position) (@ this velocity)))
-            accelerate #'(lambda (accel) (v+! (@ this velocity) accel))
-            angle-to #'(lambda (p2) (chain *math (atan2 (- (vec-y (@ p2 position))
-                                                           (vec-y (@ this position)))
-                                                        (- (vec-x (@ p2 position))
-                                                           (vec-x (@ this position))))))
-            distance-to #'(lambda (p2)
-                            (let ((dx (- (vec-x (@ p2 position)) (vec-x (@ this position))))
-                                  (dy (- (vec-y (@ p2 position)) (vec-y (@ this position)))))
-                              (sqrt (+ (* dx dx) (* dy dy)))))
-            gravitate-to #'(lambda (p2)
-                             (let ((grav (make-vector 0 0))
-                                   (dist (chain this (distance-to p2))))
-                               (setf (vec-length grav) (/ (@ p2 mass) (* dist dist))
-                                     (vec-angle grav) (chain this (angle-to p2)))
-                               (v+! (@ this velocity) grav))))))
+            gravity (make-vector 0 gravity))))
+
+(defmacro particle-pos (p)
+  `(@ ,p position))
+
+(defmacro particle-vel (p)
+  `(@ ,p velocity))
+
+(defmacro particle-x (p)
+  `(vec-x (particle-pos ,p)))
+
+(defsetf particle-x (p) (value)
+  `(setf (vec-x (particle-pos ,p)) ,value))
+
+(defmacro particle-y (p)
+  `(vec-y (particle-pos ,p)))
+
+(defsetf particle-y (p) (value)
+  `(setf (vec-y (particle-pos ,p)) ,value))
+
+(defmacro particle-mass (p)
+  `(@ ,p mass))
+
+(defmacro particle-radius (p)
+  `(@ ,p radius))
+
+(defmacro particle-bounce (p)
+  `(@ ,p bounce))
+
+(defmacro particle-grav (p)
+  `(@ ,p gravity))
+
+(defun particle-update! (p)
+  (v+! (particle-vel p) (particle-grav p))
+  (v+! (particle-pos p) (particle-vel p)))
+
+(defun particle-accelerate! (p accel)
+  (v+! (particle-vel p) accel))
+
+(defun particle-gravitate-to! (p1 p2)
+  (let ((grav (make-vector 0 0))
+        (dist (distance (particle-pos p1) (particle-pos p2))))
+    (setf (vec-length grav) (/ (particle-mass p2) (* dist dist))
+          (vec-angle grav) (angle-between (particle-pos p1) (particle-pos p2)))
+    (v+! (particle-vel p1) grav)))
 
 (defun ep-1 ()
   "Introduction"
@@ -270,9 +305,9 @@
                                    (1+ (* (random) pi 2))))))
     (def-animation-loop update
       (dolist (p particles)
-        (chain p (update))
+        (particle-update! p)
         (ctx begin-path)
-        (ctx arc (vec-x (@ p position)) (vec-y (@ p position)) 10 0 (* pi 2) false)
+        (ctx arc (particle-x p) (particle-y p) 10 0 (* pi 2) false)
         (ctx fill)))
     (update)))
 
@@ -288,9 +323,9 @@
                                    0.1))))
     (def-animation-loop update
       (dolist (p particles)
-        (chain p (update))
+        (particle-update! p)
         (ctx begin-path)
-        (ctx arc (vec-x (@ p position)) (vec-y (@ p position)) 4 0 (* pi 2) false)
+        (ctx arc (particle-x p) (particle-y p) 4 0 (* pi 2) false)
         (ctx fill)))
     (update)))
 
@@ -323,10 +358,10 @@
         (incf angle 0.05))
       (setf (vec-angle thrust) angle
             (vec-length thrust) (if thrusting 0.1 0))
-      (chain ship (accelerate thrust))
-      (chain ship (update))
+      (particle-accelerate! ship thrust)
+        (particle-update! ship)
       (with-context
-        (ctx translate (vec-x (@ ship position)) (vec-y (@ ship position)))
+        (ctx translate (particle-x ship) (particle-y ship))
         (ctx rotate angle)
         (ctx begin-path)
         (ctx move-to 10 0)
@@ -337,30 +372,31 @@
           (ctx move-to -10 0)
           (ctx line-to -18 0))
         (ctx stroke))
-      (when (> (vec-x (@ ship position)) width)
-        (setf (vec-x (@ ship position)) 0))
-      (when (< (vec-x (@ ship position)) 0)
-        (setf (vec-x (@ ship position)) width))
-      (when (> (vec-y (@ ship position)) height)
-        (setf (vec-y (@ ship position)) 0))
-      (when (< (vec-y (@ ship position)) 0)
-        (setf (vec-y (@ ship position)) height)))
+      (when (> (particle-x ship) width)
+        (setf (particle-x ship) 0))
+      (when (< (particle-x ship) 0)
+        (setf (particle-x ship) width))
+      (when (> (particle-y ship) height)
+        (setf (particle-y ship) 0))
+      (when (< (particle-y ship) 0)
+        (setf (particle-y ship) height)))
     (update)))
 
 (defun ep-11 ()
   "Gravity"
-  (let ((sun (make-particle (/ width 2) (/ height 2) 0 0 0 20000))
+  (let ((sun (make-particle (/ width 2) (/ height 2) 0 0))
         (planet (make-particle (+ (/ width 2) 200) (/ height 2) 10 (/ pi -2))))
+    (setf (particle-mass sun) 20000)
     (def-animation-loop update
-      (chain planet (gravitate-to sun))
-      (chain planet (update))
+      (particle-gravitate-to! planet sun)
+      (particle-update! planet)
       (ctx begin-path)
       (setf (ctx-get fill-style) "#ffff00")
-      (ctx arc (vec-x (@ sun position)) (vec-y (@ sun position)) 20 0 (* pi 2) false)
+      (ctx arc (particle-x sun) (particle-y sun) 20 0 (* pi 2) false)
       (ctx fill)
       (ctx begin-path)
       (setf (ctx-get fill-style) "#0000ff")
-      (ctx arc (vec-x (@ planet position)) (vec-y (@ planet position)) 5 0 (* pi 2) false)
+      (ctx arc (particle-x planet) (particle-y planet) 5 0 (* pi 2) false)
       (ctx fill))
     (update)))
 
@@ -372,62 +408,68 @@
                  collect (let ((particle (make-particle
                                           (/ width 2) height
                                           (+ (* (random) 8) 5) (+ (/ pi -2) (- (* (random) 0.2) 0.1))
-                                          0.1 1 (+ (* (random) 10) 2))))
-                           (setf (@ particle bounce) -0.9)
+                                          0.1)))
+                           (setf (particle-radius particle) (+ (* (random) 10) 2)
+                                 (particle-bounce particle) -0.9)
                            particle))))
 
     (defun wrap (p)
-      (when (> (- (vec-x (@ p position)) (@ p radius)) width)
-        (setf (vec-x (@ p position)) (- (@ p radius))))
-      (when (< (+ (vec-x (@ p position)) (@ p radius)) 0)
-        (setf (vec-x (@ p position)) (+ width (@ p radius))))
-      (when (> (- (vec-y (@ p position)) (@ p radius)) height)
-        (setf (vec-y (@ p position)) (- (@ p radius))))
-      (when (< (+ (vec-y (@ p position)) (@ p radius)) 0)
-        (setf (vec-y (@ p position)) (+ height (@ p radius)))))
+      (with-slots (radius) p
+        (when (> (- (particle-x p) radius) width)
+          (setf (particle-x p) (- radius)))
+        (when (< (+ (particle-x p) radius) 0)
+          (setf (particle-x p) (+ width radius)))
+        (when (> (- (particle-y p) radius) height)
+          (setf (particle-y p) (- radius)))
+        (when (< (+ (particle-y p) radius) 0)
+          (setf (particle-y p) (+ height radius)))))
 
     (defun remove-dead-particles (particles)
       (do ((i (1- (@ particles length)) (1- i)))
           ((< i 0))
         (let ((p (aref particles i)))
-          (when (or (> (- (vec-x (@ p position)) (@ p radius)) width)
-                    (< (+ (vec-x (@ p position)) (@ p radius)) 0)
-                    (> (- (vec-y (@ p position)) (@ p radius)) height)
-                    (< (+ (vec-y (@ p position)) (@ p radius)) 0))
-            (chain particles (splice i 1))))))
+          (with-slots (radius) p
+            (when (or (> (- (particle-x p) radius) width)
+                      (< (+ (particle-x p) radius) 0)
+                      (> (- (particle-y p) radius) height)
+                      (< (+ (particle-y p) radius) 0))
+              (chain particles (splice i 1)))))))
 
     (defun regenerate (p)
-      (when (> (- (vec-y (@ p position)) (@ p radius)) height)
-        (setf (vec-x (@ p position)) (/ width 2)
-              (vec-y (@ p position)) height
-              (vec-length (@ p velocity)) (+ (* (random) 8) 5)
-              (vec-angle (@ p velocity)) (+ (/ pi -2) (- (* (random) 0.2) 0.1)))))
+      (with-slots (radius velocity) p
+        (when (> (- (particle-y p) radius) height)
+          (setf (particle-x p) (/ width 2)
+                (particle-y p) height
+                (vec-length velocity) (+ (* (random) 8) 5)
+                (vec-angle velocity) (+ (/ pi -2) (- (* (random) 0.2) 0.1))))))
 
     (defun bounce (p)
-      (when (> (+ (vec-x (@ p position)) (@ p radius)) width)
-        (setf (vec-x (@ p position)) (- width (@ p radius))
-              (vec-x (@ p velocity)) (* (vec-x (@ p velocity)) (@ p bounce))))
-      (when (< (- (vec-x (@ p position)) (@ p radius)) 0)
-        (setf (vec-x (@ p position)) (@ p radius)
-              (vec-x (@ p velocity)) (* (vec-x (@ p velocity)) (@ p bounce))))
-      (when (> (+ (vec-y (@ p position)) (@ p radius)) height)
-        (setf (vec-y (@ p position)) (- height (@ p radius))
-              (vec-y (@ p velocity)) (* (vec-y (@ p velocity)) (@ p bounce))))
-      (when (< (- (vec-y (@ p position)) (@ p radius)) 0)
-        (setf (vec-y (@ p position)) (@ p radius)
-              (vec-y (@ p velocity)) (* (vec-y (@ p velocity)) (@ p bounce)))))
+      (with-slots (velocity radius bounce) p
+        (with-slots ((vx x) (vy y)) velocity
+          (when (> (+ (particle-x p) radius) width)
+            (setf (particle-x p) (- width radius)
+                  vx (* vx bounce)))
+          (when (< (- (particle-x p) radius) 0)
+            (setf (particle-x p) radius
+                  vx (* vx bounce)))
+          (when (> (+ (particle-y p) radius) height)
+            (setf (particle-y p) (- height radius)
+                  vy (* vy bounce)))
+          (when (< (- (particle-y p) radius) 0)
+            (setf (particle-y p) radius
+                  vy (* vy bounce))))))
 
     (def-animation-loop update ()
       (dolist (p particles)
-        (chain p (update))
+        (particle-update! p)
         (ctx begin-path)
-        (ctx arc (vec-x (@ p position)) (vec-y (@ p position)) (@ p radius) 0 (* pi 2) false)
+        (ctx arc (particle-x p) (particle-y p) (particle-radius p) 0 (* pi 2) false)
         (ctx fill)
         ;; (wrap p)
         ;; (regenerate p)
         (bounce p)
         )
-      ;; (chain (remove-dead-particles particles))) ; removal
+      ;; (chain (remove-dead-particles particles))
       )
     (update)))
 
