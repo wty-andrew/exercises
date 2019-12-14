@@ -100,18 +100,33 @@
   (v*! v (/ 1 scalar)))
 
 ;; particle
-(defun make-particle (x y speed direction &optional (gravity 0))
+(defun make-particle (x y speed direction &optional (gravity 0) (mass 1))
   (let ((position (make-vector x y))
         (velocity (make-vector 0 0)))
     (setf (vec-length velocity) speed
           (vec-angle velocity) direction)
     (create position position
             velocity velocity
+            mass mass
             gravity (make-vector 0 gravity)
             update #'(lambda ()
                        (v+! (@ this velocity) (@ this gravity))
                        (v+! (@ this position) (@ this velocity)))
-            accelerate #'(lambda (accel) (v+! (@ this velocity) accel)))))
+            accelerate #'(lambda (accel) (v+! (@ this velocity) accel))
+            angle-to #'(lambda (p2) (chain *math (atan2 (- (vec-y (@ p2 position))
+                                                           (vec-y (@ this position)))
+                                                        (- (vec-x (@ p2 position))
+                                                           (vec-x (@ this position))))))
+            distance-to #'(lambda (p2)
+                            (let ((dx (- (vec-x (@ p2 position)) (vec-x (@ this position))))
+                                  (dy (- (vec-y (@ p2 position)) (vec-y (@ this position)))))
+                              (sqrt (+ (* dx dx) (* dy dy)))))
+            gravitate-to #'(lambda (p2)
+                             (let ((grav (make-vector 0 0))
+                                   (dist (chain this (distance-to p2))))
+                               (setf (vec-length grav) (/ (@ p2 mass) (* dist dist))
+                                     (vec-angle grav) (chain this (angle-to p2)))
+                               (v+! (@ this velocity) grav))))))
 
 (defun ep-1 ()
   "Introduction"
@@ -277,4 +292,74 @@
         (ctx fill)))
     (update)))
 
-(setf (@ window onload) ep-9)
+(defun ep-10 ()
+  "Advanced Acceleration"
+  (let ((ship (make-particle (/ width 2) (/ height 2) 0 0))
+        (thrust (make-vector 0 0))
+        (angle 0)
+        (turing-left nil)
+        (turing-right nil)
+        (thrusting nil))
+    (chain document body (add-event-listener
+                          "keydown"
+                          #'(lambda (evt)
+                              (case (@ evt key-code)
+                                (38 (setf thrusting t)) ; up
+                                (37 (setf turing-left t)) ; left
+                                (39 (setf turing-right t)))))) ; right
+    (chain document body (add-event-listener
+                          "keyup"
+                          #'(lambda (evt)
+                              (case (@ evt key-code)
+                                (38 (setf thrusting nil))
+                                (37 (setf turing-left nil))
+                                (39 (setf turing-right nil))))))
+    (def-animation-loop update
+      (when turing-left
+        (decf angle 0.05))
+      (when turing-right
+        (incf angle 0.05))
+      (setf (vec-angle thrust) angle
+            (vec-length thrust) (if thrusting 0.1 0))
+      (chain ship (accelerate thrust))
+      (chain ship (update))
+      (with-context
+        (ctx translate (vec-x (@ ship position)) (vec-y (@ ship position)))
+        (ctx rotate angle)
+        (ctx begin-path)
+        (ctx move-to 10 0)
+        (ctx line-to -10 -7)
+        (ctx line-to -10 7)
+        (ctx line-to 10 0)
+        (when thrusting
+          (ctx move-to -10 0)
+          (ctx line-to -18 0))
+        (ctx stroke))
+      (when (> (vec-x (@ ship position)) width)
+        (setf (vec-x (@ ship position)) 0))
+      (when (< (vec-x (@ ship position)) 0)
+        (setf (vec-x (@ ship position)) width))
+      (when (> (vec-y (@ ship position)) height)
+        (setf (vec-y (@ ship position)) 0))
+      (when (< (vec-y (@ ship position)) 0)
+        (setf (vec-y (@ ship position)) height)))
+    (update)))
+
+(defun ep-11 ()
+  "Gravity"
+  (let ((sun (make-particle (/ width 2) (/ height 2) 0 0 0 20000))
+        (planet (make-particle (+ (/ width 2) 200) (/ height 2) 10 (/ pi -2))))
+    (def-animation-loop update
+      (chain planet (gravitate-to sun))
+      (chain planet (update))
+      (ctx begin-path)
+      (setf (ctx-get fill-style) "#ffff00")
+      (ctx arc (vec-x (@ sun position)) (vec-y (@ sun position)) 20 0 (* pi 2) false)
+      (ctx fill)
+      (ctx begin-path)
+      (setf (ctx-get fill-style) "#0000ff")
+      (ctx arc (vec-x (@ planet position)) (vec-y (@ planet position)) 5 0 (* pi 2) false)
+      (ctx fill))
+    (update)))
+
+(setf (@ window onload) ep-11)
