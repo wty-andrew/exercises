@@ -39,22 +39,16 @@ function vbang(v1, v2) {
     return v1.y -= v2.y;
 };
 function vstarbang(v, scalar) {
-    var _js284 = v;
-    var _js283 = v.x * scalar;
-    _js284.x = _js283;
-    var _js286 = v;
-    var _js285 = v.y * scalar;
-    return _js286.y = _js285;
+    var _js17 = v;
+    var _js16 = v.x * scalar;
+    _js17.x = _js16;
+    var _js19 = v;
+    var _js18 = v.y * scalar;
+    return _js19.y = _js18;
 };
 function vslashbang(v, scalar) {
     __PS_MV_REG = [];
     return vstarbang(v, 1 / scalar);
-};
-function distance(v1, v2) {
-    var dx = v2.x - v1.x;
-    var dy = v2.y - v1.y;
-    __PS_MV_REG = [];
-    return Math.sqrt(dx * dx + dy * dy);
 };
 function angleBetween(v1, v2) {
     return Math.atan2(v2.y - v1.y, v2.x - v1.x);
@@ -70,5 +64,4 @@ window.vplusbang = vplusbang;
 window.vbang = vbang;
 window.vstarbang = vstarbang;
 window.vslashbang = vslashbang;
-window.distance = distance;
 window.angleBetween = angleBetween;

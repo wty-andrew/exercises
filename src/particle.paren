@@ -8,6 +8,7 @@
             mass 1
             radius 0
             bounce -1
+            friction 1
             gravity (make-vector 0 gravity))))
 
 (defmacro particle-pos (p)
@@ -40,9 +41,14 @@
 (defmacro particle-grav (p)
   `(@ ,p gravity))
 
+(defmacro particle-friction (p)
+  `(@ ,p friction))
+
 (defun particle-update! (p)
-  (v+! (particle-vel p) (particle-grav p))
-  (v+! (particle-pos p) (particle-vel p)))
+  (with-slots (position velocity gravity friction) p
+    (v*! velocity friction)
+    (v+! velocity gravity)
+    (v+! position velocity)))
 
 (defun particle-accelerate! (p accel)
   (v+! (particle-vel p) accel))

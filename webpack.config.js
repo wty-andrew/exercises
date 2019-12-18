@@ -2,6 +2,7 @@ const path = require('path')
 
 module.exports = {
   entry: {
+    utils: './src/utils.js',
     vector: './src/vector.js',
     particle: './src/particle.js',
     index: './src/index.js',
