@@ -18,9 +18,12 @@ function distanceXy(x0, y0, x1, y1) {
     __PS_MV_REG = [];
     return Math.sqrt(dx * dx + dy * dy);
 };
-function distance(p1, p2) {
+function distance(a, b) {
     __PS_MV_REG = [];
-    return distanceXy(p1.x, p1.y, p2.x, p2.y);
+    return distanceXy(a.x, a.y, b.x, b.y);
+};
+function angleBetween(a, b) {
+    return Math.atan2(b.y - a.y, b.x - a.x);
 };
 function circleCollision(c0, c1) {
     __PS_MV_REG = [];
@@ -66,6 +69,7 @@ window.map = map;
 window.clamp = clamp;
 window.distance = distance;
 window.distanceXy = distanceXy;
+window.angleBetween = angleBetween;
 window.circleCollision = circleCollision;
 window.circlePointCollision = circlePointCollision;
 window.pointInRect = pointInRect;

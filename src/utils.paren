@@ -44,8 +44,12 @@
         (dy (- y1 y0)))
     (sqrt (+ (* dx dx) (* dy dy)))))
 
-(defun distance (p1 p2)
-  (distance-xy (@ p1 x) (@ p1 y) (@ p2 x) (@ p2 y)))
+(defun distance (a b)
+  (distance-xy (@ a x) (@ a y) (@ b x) (@ b y)))
+
+(defun angle-between (a b)
+  (chain *math (atan2 (- (@ b y) (@ a y))
+                      (- (@ b x) (@ a x)))))
 
 (defun circle-collision (c0 c1)
   (<= (distance c0 c1) (+ (@ c0 radius) (@ c1 radius))))
@@ -85,7 +89,7 @@
 (defun random-int (min max)
   (floor (random-range min (1+ max))))
 
-(exports norm lerp map clamp distance distance-xy
+(exports norm lerp map clamp distance distance-xy angle-between
          circle-collision circle-point-collision
          point-in-rect in-range range-intersect rect-intersect
          degree->rad rad->degree

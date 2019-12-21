@@ -50,9 +50,6 @@ function vslashbang(v, scalar) {
     __PS_MV_REG = [];
     return vstarbang(v, 1 / scalar);
 };
-function angleBetween(v1, v2) {
-    return Math.atan2(v2.y - v1.y, v2.x - v1.x);
-};
 window.makeVector = makeVector;
 window.vecAngle = vecAngle;
 window.vecLength = vecLength;
@@ -64,4 +61,3 @@ window.vplusbang = vplusbang;
 window.vbang = vbang;
 window.vstarbang = vstarbang;
 window.vslashbang = vslashbang;
-window.angleBetween = angleBetween;

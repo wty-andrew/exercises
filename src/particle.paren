@@ -1,33 +1,25 @@
 (defun make-particle (x y speed direction &optional (gravity 0))
-  (let ((position (make-vector x y))
-        (velocity (make-vector 0 0)))
-    (setf (vec-length velocity) speed
-          (vec-angle velocity) direction)
-    (create position position
-            velocity velocity
-            mass 1
-            radius 0
-            bounce -1
-            friction 1
-            gravity (make-vector 0 gravity))))
-
-(defmacro particle-pos (p)
-  `(@ ,p position))
-
-(defmacro particle-vel (p)
-  `(@ ,p velocity))
+  (create x x
+          y y
+          vx (* (cos direction) speed)
+          vy (* (sin direction) speed)
+          mass 1
+          radius 0
+          bounce -1
+          friction 1
+          gravity gravity))
 
 (defmacro particle-x (p)
-  `(vec-x (particle-pos ,p)))
-
-(defsetf particle-x (p) (value)
-  `(setf (vec-x (particle-pos ,p)) ,value))
+  `(@ ,p x))
 
 (defmacro particle-y (p)
-  `(vec-y (particle-pos ,p)))
+  `(@ ,p y))
 
-(defsetf particle-y (p) (value)
-  `(setf (vec-y (particle-pos ,p)) ,value))
+(defmacro particle-vx (p)
+  `(@ ,p vx))
+
+(defmacro particle-vy (p)
+  `(@ ,p vy))
 
 (defmacro particle-mass (p)
   `(@ ,p mass))
@@ -45,19 +37,25 @@
   `(@ ,p friction))
 
 (defun particle-update! (p)
-  (with-slots (position velocity gravity friction) p
-    (v*! velocity friction)
-    (v+! velocity gravity)
-    (v+! position velocity)))
+  (with-slots (x y vx vy gravity friction) p
+    (setf vx (* vx friction)
+          vy (+ (* vy friction) gravity)
+          x (+ x vx)
+          y (+ y vy))))
 
 (defun particle-accelerate! (p accel)
-  (v+! (particle-vel p) accel))
+  (incf (particle-vx p) (vec-x accel))
+  (incf (particle-vy p) (vec-y accel)))
 
 (defun particle-gravitate-to! (p1 p2)
-  (let ((grav (make-vector 0 0))
-        (dist (distance (particle-pos p1) (particle-pos p2))))
-    (setf (vec-length grav) (/ (particle-mass p2) (* dist dist))
-          (vec-angle grav) (angle-between (particle-pos p1) (particle-pos p2)))
-    (v+! (particle-vel p1) grav)))
+  (let* ((dx (- (particle-x p2) (particle-x p1)))
+         (dy (- (particle-y p2) (particle-y p1)))
+         (dist-sq (+ (* dx dx) (* dy dy)))
+         (dist (sqrt dist-sq))
+         (force (/ (particle-mass p2) dist-sq))
+         (ax (* (/ dx dist) force))
+         (ay (* (/ dy dist) force)))
+    (incf (particle-vx p1) ax)
+    (incf (particle-vy p1) ay)))
 
 (exports make-particle particle-update! particle-accelerate! particle-gravitate-to!)

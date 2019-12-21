@@ -60,10 +60,5 @@
 (defun v/! (v scalar)
   (v*! v (/ 1 scalar)))
 
-(defun angle-between (v1 v2)
-  (chain *math (atan2 (- (vec-y v2) (vec-y v1))
-                      (- (vec-x v2) (vec-x v1)))))
-
 (exports make-vector vec-angle vec-length
-         v+ v- v* v/ v+! v-! v*! v/!
-         angle-between)
+         v+ v- v* v/ v+! v-! v*! v/!)

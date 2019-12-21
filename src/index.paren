@@ -11,39 +11,38 @@
   (do ((i (1- (@ particles length)) (1- i)))
       ((< i 0))
     (let ((p (aref particles i)))
-      (with-slots (radius) p
-        (when (or (> (- (particle-x p) radius) width)
-                  (< (+ (particle-x p) radius) 0)
-                  (> (- (particle-y p) radius) height)
-                  (< (+ (particle-y p) radius) 0))
+      (with-slots (x y radius) p
+        (when (or (> (- x radius) width)
+                  (< (+ x radius) 0)
+                  (> (- y radius) height)
+                  (< (+ y radius) 0))
           (chain particles (splice i 1)))))))
 
 (defun wrap (p)
-  (with-slots (radius) p
-    (when (> (- (particle-x p) radius) width)
-      (setf (particle-x p) (- radius)))
-    (when (< (+ (particle-x p) radius) 0)
-      (setf (particle-x p) (+ width radius)))
-    (when (> (- (particle-y p) radius) height)
-      (setf (particle-y p) (- radius)))
-    (when (< (+ (particle-y p) radius) 0)
-      (setf (particle-y p) (+ height radius)))))
+  (with-slots (x y radius) p
+    (when (> (- x radius) width)
+      (setf x (- radius)))
+    (when (< (+ x radius) 0)
+      (setf x (+ width radius)))
+    (when (> (- y radius) height)
+      (setf y (- radius)))
+    (when (< (+ y radius) 0)
+      (setf y (+ height radius)))))
 
 (defun bounce (p)
-  (with-slots (velocity radius bounce) p
-    (with-slots ((vx x) (vy y)) velocity
-      (when (> (+ (particle-x p) radius) width)
-        (setf (particle-x p) (- width radius)
-              vx (* vx bounce)))
-      (when (< (- (particle-x p) radius) 0)
-        (setf (particle-x p) radius
-              vx (* vx bounce)))
-      (when (> (+ (particle-y p) radius) height)
-        (setf (particle-y p) (- height radius)
-              vy (* vy bounce)))
-      (when (< (- (particle-y p) radius) 0)
-        (setf (particle-y p) radius
-              vy (* vy bounce))))))
+  (with-slots (x y vx vy radius bounce) p
+    (when (> (+ x radius) width)
+      (setf x (- width radius)
+            vx (* vx bounce)))
+    (when (< (- x radius) 0)
+      (setf x radius
+            vx (* vx bounce)))
+    (when (> (+ y radius) height)
+      (setf y (- height radius)
+            vy (* vy bounce)))
+    (when (< (- y radius) 0)
+      (setf y radius
+            vy (* vy bounce)))))
 
 (defun draw-particle (p)
   (ctx begin-path)
@@ -54,8 +53,8 @@
   "Introduction"
   (dotimes (_ 100)
     (ctx begin-path)
-    (ctx move-to (* (random) width) (* (random) height))
-    (ctx line-to (* (random) width) (* (random) height))
+    (ctx move-to (random-range 0 width) (random-range 0 height))
+    (ctx line-to (random-range 0 width) (random-range 0 height))
     (ctx stroke)))
 
 (defun ep-2 ()
@@ -186,8 +185,8 @@
                           collect (make-particle
                                    (/ width 2)
                                    (/ height 2)
-                                   (1+ (* (random) 4))
-                                   (1+ (* (random) pi 2))))))
+                                   (random-range 1 5)
+                                   (random-range 0 (* pi 2))))))
     (def-animation-loop update
       (dolist (p particles)
         (particle-update! p)
@@ -203,8 +202,8 @@
                           collect (make-particle
                                    (/ width 2)
                                    (/ height 3)
-                                   (+ (* (random) 5) 2)
-                                   (1+ (* (random) pi 2))
+                                   (random-range 2 7)
+                                   (random-range 0 (* pi 2))
                                    0.1))))
     (def-animation-loop update
       (dolist (p particles)
@@ -292,29 +291,29 @@
          (particles
            (loop repeat num-particles
                  collect (let ((particle (make-particle
-                                          (/ width 2) height
-                                          (+ (* (random) 8) 5) (+ (/ pi -2) (- (* (random) 0.2) 0.1))
+                                          (/ width 2)
+                                          height
+                                          (random-range 5 13)
+                                          (+ (/ pi -2) (random-range -0.1 0.1))
                                           0.1)))
-                           (setf (particle-radius particle) (+ (* (random) 10) 2)
+                           (setf (particle-radius particle) (random-range 2 12)
                                  (particle-bounce particle) -0.9)
                            particle))))
 
     (defun regenerate (p)
-      (with-slots (radius velocity) p
-        (when (> (- (particle-y p) radius) height)
-          (setf (particle-x p) (/ width 2)
-                (particle-y p) height
-                (vec-length velocity) (+ (* (random) 8) 5)
-                (vec-angle velocity) (+ (/ pi -2) (- (* (random) 0.2) 0.1))))))
-
+      (with-slots (x y vx vy radius velocity) p
+        (when (> (- y radius) height)
+          (let ((speed (random-range 5 13))
+                (direction (+ (/ pi -2) (random-range -0.1 0.1))))
+            (setf x (/ width 2)
+                  y height
+                  vx (* (cos direction) speed)
+                  vy (* (sin direction) speed))))))
 
     (def-animation-loop update ()
-      (chain console (log (@ particles length)))
       (dolist (p particles)
         (particle-update! p)
-        (ctx begin-path)
-        (ctx arc (particle-x p) (particle-y p) (particle-radius p) 0 (* pi 2) false)
-        (ctx fill)
+        (draw-particle p)
         ;; (wrap p)
         ;; (regenerate p)
         (bounce p)
@@ -325,25 +324,29 @@
 
 (defun ep-13 ()
   "Friction"
-  (let ((p (make-particle (/ width 2) (/ height 2) 10 (* (random) pi 2)))
+  (let ((p (make-particle
+            (/ width 2)
+            (/ height 2)
+            10
+            (random-range 0 (* pi 2))))
         (friction 0.97))
     (setf (particle-radius p) 10)
     (def-animation-loop update
-      (v*! (particle-vel p) friction)
-      (particle-update! p)
-      (ctx begin-path)
-      (ctx arc (particle-x p) (particle-y p) (particle-radius p) 0 (* pi 2) false)
-      (ctx fill))
+      (with-slots (vx vy) p
+        (setf vx (* vx friction)
+              vy (* vy friction))
+        (particle-update! p)
+        (draw-particle p)))
     (update)))
 
 (defun ep-14 ()
   "Collision Detection"
-  (let ((circle0 (create x (* (random) width)
-                         y (* (random) height)
-                         radius (+ 50 (* (random) 100))))
-        (circle1 (create x (* (random) width)
-                         y (* (random) height)
-                         radius (+ 50 (* (random) 100))))
+  (let ((circle0 (create x (random-range 0 width)
+                         y (random-range 0 height)
+                         radius (random-range 50 150)))
+        (circle1 (create x (random-range 0 width)
+                         y (random-range 0 height)
+                         radius (random-range 50 150)))
         (rect0 (create x 200 y 200 width 200 height 100))
         (rect1 (create x 0 y 0 width 100 height 200)))
     (labels ((draw-circle (circle)
@@ -389,14 +392,20 @@
 (defun ep-15 ()
   "Springs Part 1"
   (let ((spring-point (make-vector (/ width 2) (/ height 2)))
-        (weight (make-particle (* (random) width) (* (random) height) 50 (* (random) pi 2)))
+        (weight (make-particle
+                 (random-range 0 width)
+                 (random-range 0 height)
+                 50
+                 (random-range 0 (* pi 2))))
         (k 0.1))
     (setf (particle-radius weight) 20
           (particle-friction weight) 0.9)
-    (def-animation-loop update
-      (let* ((distance (v- spring-point (particle-pos weight)))
-             (spring-force (v* distance k)))
-        (v+! (particle-vel weight) spring-force)
+    (def-animation-loop update ()
+      (let* ((dx (- (vec-x spring-point) (particle-x weight)))
+             (dy (- (vec-y spring-point) (particle-y weight)))
+             (spring-force (make-vector (* dx k) (* dy k))))
+        (incf (particle-vx weight) (vec-x spring-force))
+        (incf (particle-vy weight) (vec-y spring-force))
         (particle-update! weight)
         (ctx begin-path)
         (ctx arc (particle-x weight) (particle-y weight) (particle-radius weight) 0 (* pi 2) false)
@@ -433,12 +442,16 @@
           (particle-friction particle-c) 0.9
           (particle-radius particle-c) 20)
     (labels ((spring (p0 p1 separation)
-               (let* ((distance (v- (particle-pos p0) (particle-pos p1)))
-                      spring-force)
-                 (setf (vec-length distance) (- (vec-length distance) separation)
-                       spring-force (v* distance k))
-                 (v+! (particle-vel p1) spring-force)
-                 (v-! (particle-vel p0) spring-force))))
+               (let* ((dx (- (particle-x p0) (particle-x p1)))
+                      (dy (- (particle-y p0) (particle-y p1)))
+                      (distance (sqrt (+ (* dx dx) (* dy dy))))
+                      (spring-force (* (- distance separation) k))
+                      (ax (* (/ dx distance) spring-force))
+                      (ay (* (/ dy distance) spring-force)))
+                 (incf (particle-vx p1) ax)
+                 (incf (particle-vy p1) ay)
+                 (decf (particle-vx p0) ax)
+                 (decf (particle-vy p0) ay))))
       (def-animation-loop update
         (spring particle-a particle-b separation)
         (spring particle-b particle-c separation)
@@ -460,4 +473,7 @@
         (ctx stroke)))
     (update)))
 
-(setf (@ window onload) ep-16)
+(defun ep-17 ()
+  "Particles - Optimization")
+
+(setf (@ window onload) ep-12)
