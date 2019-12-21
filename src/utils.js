@@ -46,6 +46,20 @@ function rectIntersect(r0, r1) {
     __PS_MV_REG = [];
     return rangeIntersect(r0.x, r0.x + r0.width, r1.x, r1.x + r1.width) && rangeIntersect(r0.y, r0.y + r0.height, r1.y, r1.y + r1.height);
 };
+function degreegreaterthanRad(deg) {
+    return (deg / 180) * Math.PI;
+};
+function radgreaterthanDegree(rad) {
+    return (rad * 180) / Math.PI;
+};
+function randomRange(min, max) {
+    __PS_MV_REG = [];
+    return lerp(Math.random(), min, max);
+};
+function randomInt(min, max) {
+    __PS_MV_REG = [];
+    return Math.floor(randomRange(min, max + 1));
+};
 window.norm = norm;
 window.lerp = lerp;
 window.map = map;
@@ -58,3 +72,7 @@ window.pointInRect = pointInRect;
 window.inRange = inRange;
 window.rangeIntersect = rangeIntersect;
 window.rectIntersect = rectIntersect;
+window.degreegreaterthanRad = degreegreaterthanRad;
+window.radgreaterthanDegree = radgreaterthanDegree;
+window.randomRange = randomRange;
+window.randomInt = randomInt;
