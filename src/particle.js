@@ -84,12 +84,12 @@ function particleSpringRemovebang(self, point) {
     };
 };
 function particleUpdatebang(p) {
-    for (var spring = null, _js_idx3995 = 0; _js_idx3995 < p.springs.length; _js_idx3995 += 1) {
-        spring = p.springs[_js_idx3995];
+    for (var spring = null, _js_idx5 = 0; _js_idx5 < p.springs.length; _js_idx5 += 1) {
+        spring = p.springs[_js_idx5];
         particleSpringTobang(p, spring.point, spring.k, spring.length);
     };
-    for (var target = null, _js_idx3996 = 0; _js_idx3996 < p.gravitations.length; _js_idx3996 += 1) {
-        target = p.gravitations[_js_idx3996];
+    for (var target = null, _js_idx6 = 0; _js_idx6 < p.gravitations.length; _js_idx6 += 1) {
+        target = p.gravitations[_js_idx6];
         particleGravitateTobang(p, target);
     };
     p.vx *= p.friction;

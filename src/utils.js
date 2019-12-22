@@ -63,6 +63,39 @@ function randomInt(min, max) {
     __PS_MV_REG = [];
     return Math.floor(randomRange(min, max + 1));
 };
+function quadraticBezier(p0, p1, p2, k, pFinal) {
+    if (pFinal === undefined) {
+        pFinal = {  };
+    };
+    pFinal.x = Math.pow(1 - k, 2) * p0.x + (1 - k) * 2 * k * p1.x + k * k * p2.x;
+    pFinal.y = Math.pow(1 - k, 2) * p0.y + (1 - k) * 2 * k * p1.y + k * k * p2.y;
+    return pFinal;
+};
+function cubicBezier(p0, p1, p2, p3, k, pFinal) {
+    if (pFinal === undefined) {
+        pFinal = {  };
+    };
+    pFinal.x = Math.pow(1 - k, 3) * p0.x + Math.pow(1 - k, 2) * 3 * k * p1.x + (1 - k) * 3 * k * k * p2.x + k * k * k * p3.x;
+    pFinal.y = Math.pow(1 - k, 3) * p0.y + Math.pow(1 - k, 2) * 3 * k * p1.y + (1 - k) * 3 * k * k * p2.y + k * k * k * p3.y;
+    return pFinal;
+};
+function multicurve(points, context) {
+    var numPoints = points.length;
+    context.moveTo(points[0].x, points[0].y);
+    var i = 1;
+    for (; i < numPoints - 2; ) {
+        var p0 = points[i];
+        var p1 = points[i + 1];
+        var midx = (p0.x + p1.x) / 2;
+        var midy = (p0.y + p1.y) / 2;
+        context.quadraticCurveTo(p0.x, p0.y, midx, midy);
+        var _js682 = i + 1;
+        i = _js682;
+    };
+    var p0_682 = points[numPoints - 2];
+    var p1_683 = points[numPoints - 1];
+    return context.quadraticCurveTo(p0_682.x, p0_682.y, p1_683.x, p1_683.y);
+};
 window.norm = norm;
 window.lerp = lerp;
 window.map = map;
@@ -80,3 +113,6 @@ window.degreegreaterthanRad = degreegreaterthanRad;
 window.radgreaterthanDegree = radgreaterthanDegree;
 window.randomRange = randomRange;
 window.randomInt = randomInt;
+window.quadraticBezier = quadraticBezier;
+window.cubicBezier = cubicBezier;
+window.multicurve = multicurve;
