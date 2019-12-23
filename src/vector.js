@@ -39,12 +39,12 @@ function vbang(v1, v2) {
     return v1.y -= v2.y;
 };
 function vstarbang(v, scalar) {
-    var _js2 = v;
-    var _js1 = v.x * scalar;
-    _js2.x = _js1;
     var _js4 = v;
-    var _js3 = v.y * scalar;
-    return _js4.y = _js3;
+    var _js3 = v.x * scalar;
+    _js4.x = _js3;
+    var _js6 = v;
+    var _js5 = v.y * scalar;
+    return _js6.y = _js5;
 };
 function vslashbang(v, scalar) {
     __PS_MV_REG = [];

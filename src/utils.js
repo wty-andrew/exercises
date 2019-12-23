@@ -89,12 +89,12 @@ function multicurve(points, context) {
         var midx = (p0.x + p1.x) / 2;
         var midy = (p0.y + p1.y) / 2;
         context.quadraticCurveTo(p0.x, p0.y, midx, midy);
-        var _js682 = i + 1;
-        i = _js682;
+        var _js1 = i + 1;
+        i = _js1;
     };
-    var p0_682 = points[numPoints - 2];
-    var p1_683 = points[numPoints - 1];
-    return context.quadraticCurveTo(p0_682.x, p0_682.y, p1_683.x, p1_683.y);
+    var p0_1 = points[numPoints - 2];
+    var p1_2 = points[numPoints - 1];
+    return context.quadraticCurveTo(p0_1.x, p0_1.y, p1_2.x, p1_2.y);
 };
 window.norm = norm;
 window.lerp = lerp;

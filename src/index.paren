@@ -559,4 +559,67 @@
       (multicurve points *ctx*)
       (ctx stroke))))
 
-(setf (@ window onload) ep-20)
+(defun ep-21 ()
+  "Bitmap Collision Detection"
+  (let ((element (chain document (create-element "canvas"))))
+    (setf (@ element id) "target")
+    (chain document body (append-child element))
+    (dolist (el (chain document (query-selector-all "canvas")))
+      (with-slots (display position top left) (@ el style)
+        (setf display "block"
+              position "absolute"
+              top "0px"
+              left "0px"))))
+  (let* ((target-canvas (chain document (get-element-by-id "target")))
+         (target-ctx (chain target-canvas (get-context "2d")))
+         (p (make-particle 0 (/ height 2) 10 0)))
+    (setf (@ target-canvas width) *width*
+          (@ target-canvas height) *height*)
+    (chain target-ctx (begin-path))
+    (chain target-ctx (arc (/ width 2) (/ height 2) 200 0 (* pi 2) false))
+    (chain target-ctx (fill))
+    (labels ((reset-particle (p)
+               (setf (particle-x p) 0
+                     (particle-y p) (/ height 2)
+                     (particle-heading p) (random-range -0.1 0.1))))
+      (def-animation-loop update
+        (with-slots (x y) p
+          (particle-update! p)
+          (ctx begin-path)
+          (ctx arc x y 4 0 (* pi 2) false)
+          (ctx fill)
+          (let ((image-data (chain target-ctx (get-image-data x y 1 1))))
+            (cond ((> (aref (@ image-data data) 3) 0)
+                   (progn
+                     (setf (@ target-ctx global-composite-operation) "destination-out")
+                     (chain target-ctx (begin-path))
+                     (chain target-ctx (arc x y 20 0 (* pi 2) false))
+                     (chain target-ctx (fill))
+                     (reset-particle p)))
+                  ((> x width) (reset-particle p)))))))
+    (update)))
+
+(defun ep-22 ()
+  "3D - Postcards in Space"
+  (let* ((fl 300)
+         (num-shapes 100)
+         (shapes (loop repeat num-shapes
+                       collect (create x (random-range -1000 1000)
+                                       y (random-range -1000 1000)
+                                       z (random-range 0 10000)))))
+    (ctx translate (/ width 2) (/ height 2))
+    (def-animation-loop update
+      (ctx clear-rect (/ width -2) (/ height -2) width height)
+      (dolist (shape shapes)
+        (with-slots (x y z) shape
+          (let ((perspective (/ fl (+ fl z))))
+            (with-context
+              (ctx translate (* x perspective) (* y perspective))
+              (ctx scale perspective perspective)
+              (ctx fill-rect -100 -100 200 200))
+            (incf z 5)
+            (when (> z 10000)
+              (setf z 0))))))
+    (update)))
+
+(setf (@ window onload) ep-22)
