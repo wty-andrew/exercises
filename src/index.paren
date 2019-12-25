@@ -77,6 +77,7 @@
         (speed 0.1)
         (angle 0))
     (def-animation-loop render
+      (clear)
       (setf y (+ center-y (* (sin angle) offset-height))
             radius (+ base-radius (* (sin (/ angle 2)) offset-radius))
             alpha (+ base-alpha (* (sin (/ angle 2)) offset-alpha))
@@ -100,6 +101,7 @@
         (y-speed 0.131)
         x y)
     (def-animation-loop render
+      (clear)
       (setf x (+ center-x (* (cos x-angle) x-radius))
             y (+ center-y (* (sin y-angle) y-radius)))
       (ctx begin-path)
@@ -124,6 +126,7 @@
         dy
         (angle 0))
     (def-animation-loop render
+      (clear)
       (setf arrow-x (+ center-x (* (cos x-angle) (/ width 6)))
             arrow-y (+ center-y (* (sin y-angle) (/ height 3))))
       (with-context ()
@@ -188,6 +191,7 @@
                                    (random-range 1 5)
                                    (random-range 0 (* pi 2))))))
     (def-animation-loop update
+      (clear)
       (dolist (p particles)
         (particle-update! p)
         (ctx begin-path)
@@ -206,6 +210,7 @@
                                    (random-range 0 (* pi 2))
                                    0.1))))
     (def-animation-loop update
+      (clear)
       (dolist (p particles)
         (particle-update! p)
         (ctx begin-path)
@@ -237,6 +242,7 @@
                                 (37 (setf turing-left nil))
                                 (39 (setf turing-right nil))))))
     (def-animation-loop update
+      (clear)
       (when turing-left
         (decf angle 0.05))
       (when turing-right
@@ -274,6 +280,7 @@
     (setf (particle-mass sun) 20000)
     (particle-gravitation-add! planet sun)
     (def-animation-loop update
+      (clear)
       (particle-update! planet)
       (ctx begin-path)
       (setf (ctx-get fill-style) "#ffff00")
@@ -311,6 +318,7 @@
                   vy (* (sin direction) speed))))))
 
     (def-animation-loop update ()
+      (clear)
       (dolist (p particles)
         (particle-update! p)
         (draw-particle p)
@@ -332,6 +340,7 @@
         (friction 0.97))
     (setf (particle-radius p) 10)
     (def-animation-loop update
+      (clear)
       (with-slots (vx vy) p
         (setf vx (* vx friction)
               vy (* vy friction))
@@ -402,6 +411,7 @@
           (particle-friction weight) 0.9)
     (particle-spring-add! weight spring-point k)
     (def-animation-loop update ()
+      (clear)
       (with-slots (x y radius) weight
         (particle-update! weight)
         (ctx begin-path)
@@ -445,6 +455,7 @@
     (particle-spring-add! particle-c particle-a k separation)
     (particle-spring-add! particle-c particle-b k separation)
     (def-animation-loop update
+      (clear)
       (bounce particle-a)
       (bounce particle-b)
       (bounce particle-c)
@@ -489,6 +500,7 @@
                (setf (ctx-get fill-style) color)
                (draw-particle p)))
       (def-animation-loop update
+        (clear)
         (draw sun1 "yellow")
         (draw sun2 "yellow")
         (dolist (p particles)
@@ -515,6 +527,7 @@
         (direction 0.01)
         (p-final (create)))
     (def-animation-loop draw
+      (clear)
       (ctx begin-path)
       (ctx move-to (@ p0 x) (@ p0 y))
       (ctx bezier-curve-to (@ p1 x) (@ p1 y) (@ p2 x) (@ p2 y) (@ p3 x) (@ p3 y))
@@ -583,6 +596,7 @@
                      (particle-y p) (/ height 2)
                      (particle-heading p) (random-range -0.1 0.1))))
       (def-animation-loop update
+        (clear)
         (with-slots (x y) p
           (particle-update! p)
           (ctx begin-path)
@@ -701,4 +715,149 @@
     (ctx stroke))
     (update)))
 
-(setf (@ window onload) ep-24)
+(defun ep-25 ()
+  "3D Modeling, Points and Lines Part 2"
+  (let ((fl 300)
+        (points (array (create x -500 y -500 z 1000)
+                       (create x 500 y -500 z 1000)
+                       (create x 500 y -500 z 500)
+                       (create x -500 y -500 z 500)
+                       (create x -500 y 500 z 1000)
+                       (create x 500 y 500 z 1000)
+                       (create x 500 y 500 z 500)
+                       (create x -500 y 500 z 500)))
+        (needs-update t))
+    (ctx translate (/ width 2) (/ height 2))
+    (labels ((project ()
+               (dolist (p points)
+                 (with-slots (x y z) p
+                   (let ((scale (/ fl (+ fl z))))
+                     (setf (@ p sx) (* x scale)
+                           (@ p sy) (* y scale))))))
+             (draw-line ()
+               (let ((p (aref points (aref arguments 0))))
+                 (ctx move-to (@ p sx) (@ p sy))
+                 (loop for i from 1 to (1- (@ arguments length))
+                       do (let ((p (aref points (aref arguments i))))
+                            (ctx line-to (@ p sx) (@ p sy))))))
+             (translate-model (x y z)
+               (dolist (p points)
+                 (incf (@ p x) x)
+                 (incf (@ p y) y)
+                 (incf (@ p z) z))
+               (setf needs-update t)))
+      (chain document body (add-event-listener
+                            "keydown"
+                            #'(lambda (evt)
+                                (case (@ evt key-code)
+                                  (37 (translate-model -20 0 0))
+                                  (39 (translate-model 20 0 0))
+                                  (38 (if (@ evt shift-key)
+                                          (translate-model 0 0 20)
+                                          (translate-model 0 -20 0)))
+                                  (40 (if (@ evt shift-key)
+                                          (translate-model 0 0 -20)
+                                          (translate-model 0 20 0)))))))
+      (def-animation-loop update
+        (when needs-update
+          (ctx clear-rect (/ width -2) (/ height -2) width height)
+          (project)
+          (ctx begin-path)
+          (draw-line 0 1 2 3 0)
+          (draw-line 4 5 6 7 4)
+          (draw-line 0 4)
+          (draw-line 1 5)
+          (draw-line 2 6)
+          (draw-line 3 7)
+          (ctx stroke)
+          (setf needs-update nil))))
+    (update)))
+
+(defun ep-26 ()
+  "2D and 3D Coordinate Rotation"
+  (let ((fl 300)
+        (center-z 1500)
+        (points (array (create x -500 y -500 z 500)
+                       (create x 500 y -500 z 500)
+                       (create x 500 y -500 z -500)
+                       (create x -500 y -500 z -500)
+                       (create x -500 y 500 z 500)
+                       (create x 500 y 500 z 500)
+                       (create x 500 y 500 z -500)
+                       (create x -500 y 500 z -500)))
+        (needs-update t))
+    (ctx translate (/ width 2) (/ height 2))
+    (labels ((project ()
+               (dolist (p points)
+                 (with-slots (x y z) p
+                   (let ((scale (/ fl (+ fl z center-z))))
+                     (setf (@ p sx) (* x scale)
+                           (@ p sy) (* y scale))))))
+             (draw-line ()
+               (let ((p (aref points (aref arguments 0))))
+                 (ctx move-to (@ p sx) (@ p sy))
+                 (loop for i from 1 to (1- (@ arguments length))
+                       do (let ((p (aref points (aref arguments i))))
+                            (ctx line-to (@ p sx) (@ p sy))))))
+             (translate-model (x y z)
+               (dolist (p points)
+                 (incf (@ p x) x)
+                 (incf (@ p y) y)
+                 (incf (@ p z) z))
+               (setf needs-update t))
+             (rotate-x (angle)
+               (let ((cos (cos angle))
+                     (sin (sin angle)))
+                 (dolist (p points)
+                   (with-slots (y z) p
+                     (setf y (- (* y cos) (* z sin))
+                           z (+ (* z cos) (* y sin))))))
+               (setf needs-update t))
+             (rotate-y (angle)
+               (let ((cos (cos angle))
+                     (sin (sin angle)))
+                 (dolist (p points)
+                   (with-slots (x z) p
+                     (setf x (- (* x cos) (* z sin))
+                           z (+ (* z cos) (* x sin))))))
+               (setf needs-update t))
+             (rotate-z (angle)
+               (let ((cos (cos angle))
+                     (sin (sin angle)))
+                 (dolist (p points)
+                   (with-slots (x y) p
+                     (setf x (- (* x cos) (* y sin))
+                           y (+ (* y cos) (* x sin))))))
+               (setf needs-update t)))
+      (chain document body (add-event-listener
+                            "keydown"
+                            #'(lambda (evt)
+                                (case (@ evt key-code)
+                                  (37 (if (@ evt ctrl-key)
+                                          (rotate-y 0.05)
+                                          (translate-model -20 0 0)))
+                                  (39 (if (@ evt ctrl-key)
+                                          (rotate-y -0.05)
+                                          (translate-model 20 0 0)))
+                                  (38 (cond ((@ evt shift-key) (translate-model 0 0 20))
+                                            ((@ evt ctrl-key) (rotate-x 0.05))
+                                            (t (translate-model 0 -20 0))))
+                                  (40 (cond ((@ evt shift-key) (translate-model 0 0 -20))
+                                            ((@ evt ctrl-key) (rotate-x -0.05))
+                                            (t (translate-model 0 20 0))))))))
+      (def-animation-loop update
+        (when needs-update
+          (ctx clear-rect (/ width -2) (/ height -2) width height)
+          (project)
+          (ctx begin-path)
+          (draw-line 0 1 2 3 0)
+          (draw-line 4 5 6 7 4)
+          (draw-line 0 4)
+          (draw-line 1 5)
+          (draw-line 2 6)
+          (draw-line 3 7)
+          (ctx stroke)
+          (setf needs-update nil))))
+    (update)))
+
+(setf (@ window onload) ep-26)

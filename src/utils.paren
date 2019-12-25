@@ -22,7 +22,6 @@
 
 (defmacro def-animation-loop (name &body body)
   `(defun ,name ()
-     (clear)
      ,@body
      (request-animation-frame ,name)))
 
