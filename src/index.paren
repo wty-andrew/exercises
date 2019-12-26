@@ -860,4 +860,54 @@
           (setf needs-update nil))))
     (update)))
 
-(setf (@ window onload) ep-26)
+(defun ep-27 ()
+  "Easing and Tweening"
+  (let ((target (make-vector width (* (random) height)))
+        (position (make-vector 0 (* (random) height)))
+        (ease 0.1))
+    (chain document body (add-event-listener
+                            "mousemove"
+                            #'(lambda (evt)
+                                (setf (@ target x) (@ evt client-x)
+                                      (@ target y) (@ evt client-y)))))
+    (def-animation-loop update ()
+      (with-slots (x y) position
+        (ctx clear-rect 0 0 width height)
+        (ctx begin-path)
+        (ctx arc x y 10 0 (* pi 2) false)
+        (ctx fill)
+        (incf x (* (- (@ target x) x) ease))
+        (incf y (* (- (@ target y) y) ease))))
+    (update)))
+
+(defun ep-28 ()
+  "More on Easing"
+  (let* ((target (make-vector width (* (random) height)))
+         (num-points 100)
+         (points (loop repeat num-points
+                       collect (make-vector 0 0)))
+        (ease 0.5))
+    (chain document body (add-event-listener
+                          "mousemove"
+                          #'(lambda (evt)
+                              (setf (@ target x) (@ evt client-x)
+                                    (@ target y) (@ evt client-y)))))
+    (labels ((ease-to (position target ease)
+               (with-slots (x y) position
+                 (incf x (* (- (@ target x) x) ease))
+                 (incf y (* (- (@ target y) y) ease)))))
+      (def-animation-loop update ()
+        (ctx clear-rect 0 0 width height)
+        (let ((leader (make-vector (@ target x) (@ target y))))
+          (loop for i from 1 to (1- num-points)
+                do (let ((point (aref points i)))
+                     (with-slots (x y) point
+                       (ease-to point leader ease)
+                       (ctx begin-path)
+                       (ctx arc x y 10 0 (* pi 2) false)
+                       (ctx fill)
+                       (setf (@ leader x) x
+                             (@ leader y) y)))))))
+    (update)))
+
+(setf (@ window onload) ep-28)
