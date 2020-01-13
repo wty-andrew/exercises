@@ -1333,4 +1333,333 @@
         (render-points))
       (update))))
 
-(setf (@ window onload) ep-36)
+(defun ep-37 ()
+  "Verlet Integration Part II"
+  (let* ((points (array (create x 100 y 100 oldx 85 oldy 95)
+                        (create x 200 y 100 oldx 200 oldy 100)
+                        (create x 200 y 200 oldx 200 oldy 200)
+                        (create x 100 y 200 oldx 100 oldy 200)))
+         (sticks (array))
+         (bounce 0.9)
+         (gravity 0.5)
+         (friction 0.999))
+    (labels ((update-points ()
+               (dolist (p points)
+                 (with-slots (x y oldx oldy) p
+                   (let ((vx (* (- x oldx) friction))
+                         (vy (* (- y oldy) friction)))
+                     (setf oldx x
+                           oldy y
+                           x (+ x vx)
+                           y (+ y vy gravity))))))
+             (constraint-points ()
+               (dolist (p points)
+                 (with-slots (x y oldx oldy) p
+                   (let ((vx (* (- x oldx) friction))
+                         (vy (* (- y oldy) friction)))
+                     (when (> x width)
+                       (setf x width
+                             oldx (+ x (* vx bounce))))
+                     (when (< x 0)
+                       (setf x 0
+                             oldx (+ x (* vx bounce))))
+                     (when (> y height)
+                       (setf y height
+                             oldy (+ y (* vy bounce))))
+                     (when (< y 0)
+                       (setf y 0
+                             oldy (+ y (* vy bounce))))))))
+             (update-sticks ()
+               (dolist (s sticks)
+                 (with-slots (p0 p1) s
+                   (let* ((dx (- (@ p1 x) (@ p0 x)))
+                          (dy (- (@ p1 y) (@ p0 y)))
+                          (dist (sqrt (+ (* dx dx) (* dy dy))))
+                          (diff (- (@ s length) dist))
+                          (percent (/ diff dist 2))
+                          (offset-x (* dx percent))
+                          (offset-y (* dy percent)))
+                     (decf (@ p0 x) offset-x)
+                     (decf (@ p0 y) offset-y)
+                     (incf (@ p1 x) offset-x)
+                     (incf (@ p1 y) offset-y)))))
+             (render-points ()
+               (clear)
+               (dolist (p points)
+                 (with-slots (x y) p
+                   (ctx begin-path)
+                   (ctx arc x y 5 0 (* pi 2))
+                   (ctx fill))))
+             (render-sticks ()
+               (ctx begin-path)
+               (dolist (s sticks)
+                 (with-slots (p0 p1) s
+                   (ctx move-to (@ p0 x) (@ p0 y))
+                   (ctx line-to (@ p1 x) (@ p1 y))))
+               (ctx stroke)))
+      (let ((p0 (aref points 0))
+            (p1 (aref points 1))
+            (p2 (aref points 2))
+            (p3 (aref points 3)))
+        (chain sticks (push (create p0 p0 p1 p1 length (distance p0 p1))))
+        (chain sticks (push (create p0 p1 p1 p2 length (distance p1 p2))))
+        (chain sticks (push (create p0 p2 p1 p3 length (distance p2 p3))))
+        (chain sticks (push (create p0 p3 p1 p0 length (distance p3 p0))))
+        (chain sticks (push (create p0 p0 p1 p2 length (distance p0 p2)))))
+      (def-animation-loop update
+        (update-points)
+        (loop repeat 3
+              do (progn
+                   (update-sticks)
+                   (constraint-points)))
+        (render-points)
+        (render-sticks))
+      (update))))
+
+(defun ep-38 ()
+  "Verlet Integration Part III"
+  (let* ((points (array (create x 100
+                                y 100
+                                oldx (+ 50 (* (random) 100))
+                                oldy (+ 50 (* (random) 100)))
+                        (create x 420 y 100 oldx 420 oldy 100)
+                        (create x 420 y 340 oldx 420 oldy 340)
+                        (create x 100 y 340 oldx 100 oldy 340)))
+         (sticks (array))
+         (forms (array))
+         (images (array))
+         (bounce 0.9)
+         (gravity 0.5)
+         (friction 0.999))
+    (labels ((update-points ()
+               (dolist (p points)
+                 (with-slots (x y oldx oldy) p
+                   (let ((vx (* (- x oldx) friction))
+                         (vy (* (- y oldy) friction)))
+                     (setf oldx x
+                           oldy y
+                           x (+ x vx)
+                           y (+ y vy gravity))))))
+             (constraint-points ()
+               (dolist (p points)
+                 (with-slots (x y oldx oldy) p
+                   (let ((vx (* (- x oldx) friction))
+                         (vy (* (- y oldy) friction)))
+                     (when (> x width)
+                       (setf x width
+                             oldx (+ x (* vx bounce))))
+                     (when (< x 0)
+                       (setf x 0
+                             oldx (+ x (* vx bounce))))
+                     (when (> y height)
+                       (setf y height
+                             oldy (+ y (* vy bounce))))
+                     (when (< y 0)
+                       (setf y 0
+                             oldy (+ y (* vy bounce))))))))
+             (update-sticks ()
+               (dolist (s sticks)
+                 (with-slots (p0 p1) s
+                   (let* ((dx (- (@ p1 x) (@ p0 x)))
+                          (dy (- (@ p1 y) (@ p0 y)))
+                          (dist (sqrt (+ (* dx dx) (* dy dy))))
+                          (diff (- (@ s length) dist))
+                          (percent (/ diff dist 2))
+                          (offset-x (* dx percent))
+                          (offset-y (* dy percent)))
+                     (decf (@ p0 x) offset-x)
+                     (decf (@ p0 y) offset-y)
+                     (incf (@ p1 x) offset-x)
+                     (incf (@ p1 y) offset-y)))))
+             (render-points ()
+               (dolist (p points)
+                 (with-slots (x y) p
+                   (ctx begin-path)
+                   (ctx arc x y 5 0 (* pi 2))
+                   (ctx fill))))
+             (render-sticks ()
+               (dolist (s sticks)
+                 (with-slots (p0 p1 hidden color width) s
+                   (unless hidden
+                     (ctx begin-path)
+                     (setf (ctx-get stroke-style) (if color color "black")
+                           (ctx-get line-width) (if width width 1))
+                     (ctx move-to (@ p0 x) (@ p0 y))
+                     (ctx line-to (@ p1 x) (@ p1 y))
+                     (ctx stroke)))))
+             (render-forms ()
+               (dolist (form forms)
+                 (with-slots (path color) form
+                   (ctx begin-path)
+                   (setf (ctx-get fill-style) color)
+                   (ctx move-to (@ (aref path 0) x) (@ (aref path 0) y))
+                   (loop for i from 1 to (1- (@ path length))
+                         do (ctx line-to (@ (aref path i) x) (@ (aref path i) y)))
+                   (ctx fill))))
+             (render-images ()
+               (dolist (img images)
+                 (let* ((p0 (aref (@ img path) 0))
+                        (p1 (aref (@ img path) 1))
+                        (p3 (aref (@ img path) 3))
+                        (w (distance p0 p1))
+                        (h (distance p0 p3))
+                        (dx (- (@ p1 x) (@ p0 x)))
+                        (dy (- (@ p1 y) (@ p0 y)))
+                        (angle (chain *math (atan2 dy dx))))
+                   (with-context
+                     (ctx translate (@ p0 x) (@ p0 y))
+                     (ctx rotate angle)
+                     (ctx draw-image (@ img img) 0 0 w h)))))
+             (load-image (url)
+               (let ((img (chain document (create-element "img"))))
+                 (setf (@ img src) url)
+                 img)))
+      (let ((p0 (aref points 0))
+            (p1 (aref points 1))
+            (p2 (aref points 2))
+            (p3 (aref points 3)))
+        (chain sticks (push (create p0 p0
+                                    p1 p1
+                                    length (distance p0 p1)
+                                    color "red"
+                                    width 5)))
+        (chain sticks (push (create p0 p1 p1 p2 length (distance p1 p2))))
+        (chain sticks (push (create p0 p2 p1 p3 length (distance p2 p3))))
+        (chain sticks (push (create p0 p3 p1 p0 length (distance p3 p0))))
+        (chain sticks (push (create p0 p0 p1 p2 length (distance p0 p2) hidden t)))
+        (chain forms (push (create path (array p0 p1 p2 p3)
+                                   color "green")))
+        (chain images (push (create path (array p0 p1 p2 p3)
+                                    img (load-image "https://picsum.photos/id/1074/320/240")))))
+      (def-animation-loop update
+        (update-points)
+        (loop repeat 3
+              do (progn
+                   (update-sticks)
+                   (constraint-points)))
+        (clear)
+        ;; (render-forms)
+        (render-images))
+      (update))))
+
+(defun ep-39 ()
+  "Verlet Integration Part IV"
+  (let* ((points (array (create x 100
+                                y 100
+                                oldx (+ 75 (* (random) 50))
+                                oldy (+ 75 (* (random) 50)))
+                        (create x 200 y 100 oldx 200 oldy 100)
+                        (create x 200 y 200 oldx 200 oldy 200)
+                        (create x 100 y 200 oldx 100 oldy 200)
+                        (create x 400 y 100 oldx 400 oldy 100)
+                        (create x 250 y 100 oldx 250 oldy 100)))
+         (sticks (array))
+         (bounce 0.9)
+         (gravity 0.5)
+         (friction 0.999)
+         (engine (create base-x 450
+                         base-y 100
+                         range 100
+                         angle 0
+                         speed 0.05
+                         x 550
+                         y 100
+                         pinned t)))
+    (labels ((update-engine ()
+               (with-slots (x y base-x base-y angle speed range) engine
+                 (setf x (+ base-x (* (cos angle) range))
+                       y (+ base-y (* (sin angle) range))
+                       angle (+ angle speed))))
+             (update-points ()
+               (dolist (p points)
+                 (with-slots (x y oldx oldy pinned) p
+                   (unless pinned
+                     (let ((vx (* (- x oldx) friction))
+                           (vy (* (- y oldy) friction)))
+                       (setf oldx x
+                             oldy y
+                             x (+ x vx)
+                             y (+ y vy gravity)))))))
+             (constraint-points ()
+               (dolist (p points)
+                 (with-slots (x y oldx oldy pinned) p
+                   (unless pinned
+                     (let ((vx (* (- x oldx) friction))
+                           (vy (* (- y oldy) friction)))
+                       (when (> x width)
+                         (setf x width
+                               oldx (+ x (* vx bounce))))
+                       (when (< x 0)
+                         (setf x 0
+                               oldx (+ x (* vx bounce))))
+                       (when (> y height)
+                         (setf y height
+                               oldy (+ y (* vy bounce))))
+                       (when (< y 0)
+                         (setf y 0
+                               oldy (+ y (* vy bounce)))))))))
+             (update-sticks ()
+               (dolist (s sticks)
+                 (with-slots (p0 p1) s
+                   (let* ((dx (- (@ p1 x) (@ p0 x)))
+                          (dy (- (@ p1 y) (@ p0 y)))
+                          (dist (sqrt (+ (* dx dx) (* dy dy))))
+                          (diff (- (@ s length) dist))
+                          (percent (/ diff dist 2))
+                          (offset-x (* dx percent))
+                          (offset-y (* dy percent)))
+                     (unless (@ p0 pinned)
+                       (decf (@ p0 x) offset-x)
+                       (decf (@ p0 y) offset-y))
+                     (unless (@ p1 pinned)
+                       (incf (@ p1 x) offset-x)
+                       (incf (@ p1 y) offset-y))))))
+             (render-points ()
+               (clear)
+               (dolist (p points)
+                 (with-slots (x y) p
+                   (ctx begin-path)
+                   (ctx arc x y 5 0 (* pi 2))
+                   (ctx fill))))
+             (render-sticks ()
+               (ctx begin-path)
+               (dolist (s sticks)
+                 (with-slots (p0 p1) s
+                   (ctx move-to (@ p0 x) (@ p0 y))
+                   (ctx line-to (@ p1 x) (@ p1 y))))
+               (ctx stroke))
+             (render-engine ()
+               (with-slots (x y base-x base-y range) engine
+                 (ctx begin-path)
+                 (ctx arc base-x base-y range 0 (* pi 2))
+                 (ctx stroke)
+                 (ctx begin-path)
+                 (ctx arc x y 5 0 (* pi 2))
+                 (ctx fill))))
+      (let ((p0 (aref points 0))
+            (p1 (aref points 1))
+            (p2 (aref points 2))
+            (p3 (aref points 3))
+            (p4 (aref points 4))
+            (p5 (aref points 5)))
+        (chain sticks (push (create p0 p0 p1 p1 length (distance p0 p1))))
+        (chain sticks (push (create p0 p1 p1 p2 length (distance p1 p2))))
+        (chain sticks (push (create p0 p2 p1 p3 length (distance p2 p3))))
+        (chain sticks (push (create p0 p3 p1 p0 length (distance p3 p0))))
+        (chain sticks (push (create p0 p0 p1 p2 length (distance p0 p2))))
+        (chain sticks (push (create p0 engine p1 p4 length (distance engine p4))))
+        (chain sticks (push (create p0 p4 p1 p5 length (distance p4 p5))))
+        (chain sticks (push (create p0 p5 p1 p0 length (distance p5 p0)))))
+      (def-animation-loop update
+        (update-engine)
+        (update-points)
+        (loop repeat 3
+              do (progn
+                   (update-sticks)
+                   (constraint-points)))
+        (render-points)
+        (render-sticks)
+        (render-engine))
+      (update))))
+
+(setf (@ window onload) ep-39)
