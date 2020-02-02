@@ -21,8 +21,8 @@ function removeDeadParticles(particles) {
         if (p.x - p.radius > width || p.x + p.radius < 0 || p.y - p.radius > height || p.y + p.radius < 0) {
             particles.splice(i, 1);
         };
-        var _js2295 = i - 1;
-        i = _js2295;
+        var _js1989 = i - 1;
+        i = _js1989;
     };
 };
 function wrap(p) {
@@ -76,8 +76,8 @@ function ep2() {
     var angle = 0;
     for (; angle < Math.PI * 2; ) {
         CTX.fillRect(angle * (width / (2 * Math.PI)), Math.sin(angle) * (width / (2 * Math.PI)), 5, 5);
-        var _js2295 = angle + 0.01;
-        angle = _js2295;
+        var _js1989 = angle + 0.01;
+        angle = _js1989;
     };
 };
 /** More Trigonometry */
@@ -187,24 +187,24 @@ function ep7() {
     console.log(v.y);
     console.log(vecAngle(v));
     console.log(vecLength(v));
-    var _js2296 = v;
-    var _js2295 = Math.PI / 6;
-    var length = vecLength(_js2296);
-    var _js2298 = _js2296;
-    var _js2297 = Math.cos(_js2295) * length;
-    _js2298.x = _js2297;
-    var _js2300 = _js2296;
-    var _js2299 = Math.sin(_js2295) * length;
-    _js2300.y = _js2299;
-    var _js2302 = v;
-    var _js2301 = 100;
-    var angle = vecAngle(_js2302);
-    var _js2304 = _js2302;
-    var _js2303 = Math.cos(angle) * _js2301;
-    _js2304.x = _js2303;
-    var _js2306 = _js2302;
-    var _js2305 = Math.sin(angle) * _js2301;
-    _js2306.y = _js2305;
+    var _js1990 = v;
+    var _js1989 = Math.PI / 6;
+    var length = vecLength(_js1990);
+    var _js1992 = _js1990;
+    var _js1991 = Math.cos(_js1989) * length;
+    _js1992.x = _js1991;
+    var _js1994 = _js1990;
+    var _js1993 = Math.sin(_js1989) * length;
+    _js1994.y = _js1993;
+    var _js1996 = v;
+    var _js1995 = 100;
+    var angle = vecAngle(_js1996);
+    var _js1998 = _js1996;
+    var _js1997 = Math.cos(angle) * _js1995;
+    _js1998.x = _js1997;
+    var _js2000 = _js1996;
+    var _js1999 = Math.sin(angle) * _js1995;
+    _js2000.y = _js1999;
     console.log(v.x);
     console.log(v.y);
     v1 = makeVector(10, 5);
@@ -226,17 +226,17 @@ function ep7() {
 function ep8() {
     var numParticles = 100;
     var particles = (function () {
-        var collect2308 = [];
-        for (var _js2307 = 0; _js2307 < numParticles; _js2307 += 1) {
-            collect2308.push(makeParticle(width / 2, height / 2, randomRange(1, 5), randomRange(0, Math.PI * 2)));
+        var collect2002 = [];
+        for (var _js2001 = 0; _js2001 < numParticles; _js2001 += 1) {
+            collect2002.push(makeParticle(width / 2, height / 2, randomRange(1, 5), randomRange(0, Math.PI * 2)));
         };
         __PS_MV_REG = [];
-        return collect2308;
+        return collect2002;
     })();
     function update() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
-        for (var p = null, _js_idx2309 = 0; _js_idx2309 < particles.length; _js_idx2309 += 1) {
-            p = particles[_js_idx2309];
+        for (var p = null, _js_idx2003 = 0; _js_idx2003 < particles.length; _js_idx2003 += 1) {
+            p = particles[_js_idx2003];
             particleUpdatebang(p);
             CTX.beginPath();
             CTX.arc(p.x, p.y, 10, 0, Math.PI * 2, false);
@@ -252,17 +252,17 @@ function ep8() {
 function ep9() {
     var numParticles = 100;
     var particles = (function () {
-        var collect2311 = [];
-        for (var _js2310 = 0; _js2310 < numParticles; _js2310 += 1) {
-            collect2311.push(makeParticle(width / 2, height / 3, randomRange(2, 7), randomRange(0, Math.PI * 2), 0.1));
+        var collect2005 = [];
+        for (var _js2004 = 0; _js2004 < numParticles; _js2004 += 1) {
+            collect2005.push(makeParticle(width / 2, height / 3, randomRange(2, 7), randomRange(0, Math.PI * 2), 0.1));
         };
         __PS_MV_REG = [];
-        return collect2311;
+        return collect2005;
     })();
     function update() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
-        for (var p = null, _js_idx2312 = 0; _js_idx2312 < particles.length; _js_idx2312 += 1) {
-            p = particles[_js_idx2312];
+        for (var p = null, _js_idx2006 = 0; _js_idx2006 < particles.length; _js_idx2006 += 1) {
+            p = particles[_js_idx2006];
             particleUpdatebang(p);
             CTX.beginPath();
             CTX.arc(p.x, p.y, 4, 0, Math.PI * 2, false);
@@ -310,24 +310,24 @@ function ep10() {
         if (turingRight) {
             angle += 0.05;
         };
-        var _js2314 = thrust;
-        var _js2313 = angle;
-        var length = vecLength(_js2314);
-        var _js2318 = _js2314;
-        var _js2317 = Math.cos(_js2313) * length;
-        _js2318.x = _js2317;
-        var _js2320 = _js2314;
-        var _js2319 = Math.sin(_js2313) * length;
-        _js2320.y = _js2319;
-        var _js2316 = thrust;
-        var _js2315 = thrusting ? 0.1 : 0;
-        var angle2321 = vecAngle(_js2316);
-        var _js2323 = _js2316;
-        var _js2322 = Math.cos(angle2321) * _js2315;
-        _js2323.x = _js2322;
-        var _js2325 = _js2316;
-        var _js2324 = Math.sin(angle2321) * _js2315;
-        _js2325.y = _js2324;
+        var _js2008 = thrust;
+        var _js2007 = angle;
+        var length = vecLength(_js2008);
+        var _js2012 = _js2008;
+        var _js2011 = Math.cos(_js2007) * length;
+        _js2012.x = _js2011;
+        var _js2014 = _js2008;
+        var _js2013 = Math.sin(_js2007) * length;
+        _js2014.y = _js2013;
+        var _js2010 = thrust;
+        var _js2009 = thrusting ? 0.1 : 0;
+        var angle2015 = vecAngle(_js2010);
+        var _js2017 = _js2010;
+        var _js2016 = Math.cos(angle2015) * _js2009;
+        _js2017.x = _js2016;
+        var _js2019 = _js2010;
+        var _js2018 = Math.sin(angle2015) * _js2009;
+        _js2019.y = _js2018;
         particleAcceleratebang(ship, thrust);
         particleUpdatebang(ship);
         CTX.save();
@@ -390,12 +390,12 @@ function ep12() {
     var numParticles = 100;
     var particles = (function () {
         var particle;
-        var collect2327 = [];
-        for (var _js2326 = 0; _js2326 < numParticles; _js2326 += 1) {
-            collect2327.push((particle = makeParticle(width / 2, height, randomRange(5, 13), Math.PI / -2 + randomRange(-0.1, 0.1), 0.1), ((particle.radius = randomRange(2, 12), particle.bounce = -0.9), particle)));
+        var collect2021 = [];
+        for (var _js2020 = 0; _js2020 < numParticles; _js2020 += 1) {
+            collect2021.push((particle = makeParticle(width / 2, height, randomRange(5, 13), Math.PI / -2 + randomRange(-0.1, 0.1), 0.1), ((particle.radius = randomRange(2, 12), particle.bounce = -0.9), particle)));
         };
         __PS_MV_REG = [];
-        return collect2327;
+        return collect2021;
     })();
     function regenerate(p) {
         if (p.y - p.radius > height) {
@@ -410,8 +410,8 @@ function ep12() {
     };
     function update() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
-        for (var p = null, _js_idx2328 = 0; _js_idx2328 < particles.length; _js_idx2328 += 1) {
-            p = particles[_js_idx2328];
+        for (var p = null, _js_idx2022 = 0; _js_idx2022 < particles.length; _js_idx2022 += 1) {
+            p = particles[_js_idx2022];
             particleUpdatebang(p);
             drawParticle(p);
             bounce(p);
@@ -526,12 +526,12 @@ function ep15() {
         return requestAnimationFrame(update);
     };
     document.body.addEventListener('mousemove', function (evt) {
-        var _js2330 = springPoint;
-        var _js2329 = evt.clientX;
-        _js2330.x = _js2329;
-        var _js2332 = springPoint;
-        var _js2331 = evt.clientY;
-        return _js2332.y = _js2331;
+        var _js2024 = springPoint;
+        var _js2023 = evt.clientX;
+        _js2024.x = _js2023;
+        var _js2026 = springPoint;
+        var _js2025 = evt.clientY;
+        return _js2026.y = _js2025;
     });
     __PS_MV_REG = [];
     return update();
@@ -590,12 +590,12 @@ function ep18() {
     var numParticles = 100;
     var particles = (function () {
         var p;
-        var collect2334 = [];
-        for (var _js2333 = 0; _js2333 < numParticles; _js2333 += 1) {
-            collect2334.push((p = makeParticle(emitter.x, emitter.y, randomRange(7, 8), Math.PI / 2 + randomRange(-0.1, 0.1)), (particleGravitationAddbang(p, sun1), particleGravitationAddbang(p, sun2), p.radius = 3, p)));
+        var collect2028 = [];
+        for (var _js2027 = 0; _js2027 < numParticles; _js2027 += 1) {
+            collect2028.push((p = makeParticle(emitter.x, emitter.y, randomRange(7, 8), Math.PI / 2 + randomRange(-0.1, 0.1)), (particleGravitationAddbang(p, sun1), particleGravitationAddbang(p, sun2), p.radius = 3, p)));
         };
         __PS_MV_REG = [];
-        return collect2334;
+        return collect2028;
     })();
     sun1.mass = 10000;
     sun1.radius = 10;
@@ -610,23 +610,23 @@ function ep18() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
         draw(sun1, 'yellow');
         draw(sun2, 'yellow');
-        for (var p = null, _js_idx2335 = 0; _js_idx2335 < particles.length; _js_idx2335 += 1) {
-            p = particles[_js_idx2335];
+        for (var p = null, _js_idx2029 = 0; _js_idx2029 < particles.length; _js_idx2029 += 1) {
+            p = particles[_js_idx2029];
             particleUpdatebang(p);
             draw(p, 'black');
             if (p.x > width || p.x < 0 || p.y > height || p.y < 0) {
                 p.x = emitter.x;
                 p.y = emitter.y;
-                var _js2337 = p;
-                var _js2336 = randomRange(7, 8);
-                var heading = particleHeading(_js2337);
-                _js2337.vx = Math.cos(heading) * _js2336;
-                _js2337.vy = Math.sin(heading) * _js2336;
-                var _js2339 = p;
-                var _js2338 = Math.PI / 2 + randomRange(-0.1, 0.1);
-                var speed = particleSpeed(_js2339);
-                _js2339.vx = Math.cos(_js2338) * speed;
-                _js2339.vy = Math.sin(_js2338) * speed;
+                var _js2031 = p;
+                var _js2030 = randomRange(7, 8);
+                var heading = particleHeading(_js2031);
+                _js2031.vx = Math.cos(heading) * _js2030;
+                _js2031.vy = Math.sin(heading) * _js2030;
+                var _js2033 = p;
+                var _js2032 = Math.PI / 2 + randomRange(-0.1, 0.1);
+                var speed = particleSpeed(_js2033);
+                _js2033.vx = Math.cos(_js2032) * speed;
+                _js2033.vy = Math.sin(_js2032) * speed;
             };
         };
         __PS_MV_REG = [];
@@ -672,20 +672,20 @@ function ep20() {
     var cp = makeVector(p1.x * 2 - (p0.x + p2.x) / 2, p1.y * 2 - (p0.y + p2.y) / 2);
     var numPoints = 10;
     var points = (function () {
-        var collect2337 = [];
-        for (var _js2336 = 0; _js2336 < numPoints; _js2336 += 1) {
-            collect2337.push(makeVector(randomRange(0, width), randomRange(0, height)));
+        var collect2031 = [];
+        for (var _js2030 = 0; _js2030 < numPoints; _js2030 += 1) {
+            collect2031.push(makeVector(randomRange(0, width), randomRange(0, height)));
         };
         __PS_MV_REG = [];
-        return collect2337;
+        return collect2031;
     })();
     var drawPoint = function (p) {
         CTX.beginPath();
         CTX.arc(p.x, p.y, 3, 0, Math.PI * 2, false);
         return CTX.fill();
     };
-    for (var p = null, _js_idx2338 = 0; _js_idx2338 < points.length; _js_idx2338 += 1) {
-        p = points[_js_idx2338];
+    for (var p = null, _js_idx2032 = 0; _js_idx2032 < points.length; _js_idx2032 += 1) {
+        p = points[_js_idx2032];
         drawPoint(p);
     };
     CTX.strokeStyle = 'lightgray';
@@ -706,13 +706,13 @@ function ep21() {
     var element = document.createElement('canvas');
     element.id = 'target';
     document.body.appendChild(element);
-    for (var el = null, _js_arrvar2340 = document.querySelectorAll('canvas'), _js_idx2339 = 0; _js_idx2339 < _js_arrvar2340.length; _js_idx2339 += 1) {
-        el = _js_arrvar2340[_js_idx2339];
-        var object2341 = el.style;
-        object2341.display = 'block';
-        object2341.position = 'absolute';
-        object2341.top = '0px';
-        object2341.left = '0px';
+    for (var el = null, _js_arrvar2034 = document.querySelectorAll('canvas'), _js_idx2033 = 0; _js_idx2033 < _js_arrvar2034.length; _js_idx2033 += 1) {
+        el = _js_arrvar2034[_js_idx2033];
+        var object2035 = el.style;
+        object2035.display = 'block';
+        object2035.position = 'absolute';
+        object2035.top = '0px';
+        object2035.left = '0px';
     };
     var targetCanvas = document.getElementById('target');
     var targetCtx = targetCanvas.getContext('2d');
@@ -725,12 +725,12 @@ function ep21() {
     var resetParticle = function (p) {
         p.x = 0;
         p.y = height / 2;
-        var _js2342 = p;
-        var _js2341 = randomRange(-0.1, 0.1);
-        var speed = particleSpeed(_js2342);
-        _js2342.vx = Math.cos(_js2341) * speed;
+        var _js2036 = p;
+        var _js2035 = randomRange(-0.1, 0.1);
+        var speed = particleSpeed(_js2036);
+        _js2036.vx = Math.cos(_js2035) * speed;
         __PS_MV_REG = [];
-        return _js2342.vy = Math.sin(_js2341) * speed;
+        return _js2036.vy = Math.sin(_js2035) * speed;
     };
     function update() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
@@ -759,21 +759,21 @@ function ep22() {
     var fl = 300;
     var numShapes = 100;
     var shapes = (function () {
-        var collect2344 = [];
-        for (var _js2343 = 0; _js2343 < numShapes; _js2343 += 1) {
-            collect2344.push({ x : randomRange(-1000, 1000),
+        var collect2038 = [];
+        for (var _js2037 = 0; _js2037 < numShapes; _js2037 += 1) {
+            collect2038.push({ x : randomRange(-1000, 1000),
                                y : randomRange(-1000, 1000),
                                z : randomRange(0, 10000)
                              });
         };
         __PS_MV_REG = [];
-        return collect2344;
+        return collect2038;
     })();
     CTX.translate(width / 2, height / 2);
     function update() {
         CTX.clearRect(width / -2, height / -2, width, height);
-        for (var shape = null, _js_idx2345 = 0; _js_idx2345 < shapes.length; _js_idx2345 += 1) {
-            shape = shapes[_js_idx2345];
+        for (var shape = null, _js_idx2039 = 0; _js_idx2039 < shapes.length; _js_idx2039 += 1) {
+            shape = shapes[_js_idx2039];
             var perspective = fl / (fl + shape.z);
             CTX.save();
             CTX.translate(shape.x * perspective, shape.y * perspective);
@@ -800,8 +800,8 @@ function ep23() {
     var baseAngle = 0;
     var rotationSpeed = 0.01;
     var cards = [];
-    var _js2346 = numCards - 1;
-    for (var i = 0; i <= _js2346; i += 1) {
+    var _js2040 = numCards - 1;
+    for (var i = 0; i <= _js2040; i += 1) {
         var y = 0;
         var angle = (Math.PI * 2 * i) / numCards;
         var img = document.createElement('img');
@@ -826,8 +826,8 @@ function ep23() {
         baseAngle += rotationSpeed;
         cards.sort(zsort);
         CTX.clearRect(width / -2, height / -2, width, height);
-        for (var card = null, _js_idx2347 = 0; _js_idx2347 < cards.length; _js_idx2347 += 1) {
-            card = cards[_js_idx2347];
+        for (var card = null, _js_idx2041 = 0; _js_idx2041 < cards.length; _js_idx2041 += 1) {
+            card = cards[_js_idx2041];
             var perspective = fl / (fl + card.z);
             CTX.save();
             CTX.scale(perspective, perspective);
@@ -857,17 +857,17 @@ function ep24() {
         var y;
         var x;
         var z;
-        var _js2348 = numPoints - 1;
-        var collect2349 = [];
-        for (var i = 0; i <= _js2348; i += 1) {
-            collect2349.push((angle = 0.2 * i, (y = (2000 - (4000 * i) / numPoints) + Math.random() * 500, (x = Math.cos(angle + baseAngle) * radius, (z = centerZ + Math.sin(angle + baseAngle) * radius, { x : x,
+        var _js2042 = numPoints - 1;
+        var collect2043 = [];
+        for (var i = 0; i <= _js2042; i += 1) {
+            collect2043.push((angle = 0.2 * i, (y = (2000 - (4000 * i) / numPoints) + Math.random() * 500, (x = Math.cos(angle + baseAngle) * radius, (z = centerZ + Math.sin(angle + baseAngle) * radius, { x : x,
                                                                                                                                                   y : y,
                                                                                                                                                   z : z,
                                                                                                                                                   angle : angle
                                                                                                                                                 })))));
         };
         __PS_MV_REG = [];
-        return collect2349;
+        return collect2043;
     })();
     CTX.translate(width / 2, height / 2);
     document.body.addEventListener('mousemove', function (evt) {
@@ -879,19 +879,19 @@ function ep24() {
         CTX.clearRect(width / -2, height / -2, width, height);
         CTX.beginPath();
         for (var i = 0; i < points.length; i += 1) {
-            var object2350 = points[i];
-            var perspective = fl / (fl + object2350.z);
+            var object2044 = points[i];
+            var perspective = fl / (fl + object2044.z);
             CTX.save();
             CTX.scale(perspective, perspective);
-            CTX.translate(object2350.x, object2350.y);
+            CTX.translate(object2044.x, object2044.y);
             if (0 === i) {
                 CTX.moveTo(0, 0);
             } else {
                 CTX.lineTo(0, 0);
             };
             CTX.restore();
-            object2350.x = Math.cos(object2350.angle + baseAngle) * radius;
-            object2350.z = centerZ + Math.sin(object2350.angle + baseAngle) * radius;
+            object2044.x = Math.cos(object2044.angle + baseAngle) * radius;
+            object2044.z = centerZ + Math.sin(object2044.angle + baseAngle) * radius;
         };
         CTX.stroke();
         __PS_MV_REG = [];
@@ -931,8 +931,8 @@ function ep25() {
     var needsUpdate = true;
     CTX.translate(width / 2, height / 2);
     var project = function () {
-        for (var p = null, _js_idx2350 = 0; _js_idx2350 < points.length; _js_idx2350 += 1) {
-            p = points[_js_idx2350];
+        for (var p = null, _js_idx2044 = 0; _js_idx2044 < points.length; _js_idx2044 += 1) {
+            p = points[_js_idx2044];
             var scale = fl / (fl + p.z);
             p.sx = p.x * scale;
             p.sy = p.y * scale;
@@ -941,15 +941,15 @@ function ep25() {
     var drawLine = function () {
         var p = points[arguments[0]];
         CTX.moveTo(p.sx, p.sy);
-        var _js2351 = arguments.length - 1;
-        for (var i = 1; i <= _js2351; i += 1) {
-            var p2352 = points[arguments[i]];
-            CTX.lineTo(p2352.sx, p2352.sy);
+        var _js2045 = arguments.length - 1;
+        for (var i = 1; i <= _js2045; i += 1) {
+            var p2046 = points[arguments[i]];
+            CTX.lineTo(p2046.sx, p2046.sy);
         };
     };
     var translateModel = function (x, y, z) {
-        for (var p = null, _js_idx2352 = 0; _js_idx2352 < points.length; _js_idx2352 += 1) {
-            p = points[_js_idx2352];
+        for (var p = null, _js_idx2046 = 0; _js_idx2046 < points.length; _js_idx2046 += 1) {
+            p = points[_js_idx2046];
             p.x += x;
             p.y += y;
             p.z += z;
@@ -1024,8 +1024,8 @@ function ep26() {
     var needsUpdate = true;
     CTX.translate(width / 2, height / 2);
     var project = function () {
-        for (var p = null, _js_idx2353 = 0; _js_idx2353 < points.length; _js_idx2353 += 1) {
-            p = points[_js_idx2353];
+        for (var p = null, _js_idx2047 = 0; _js_idx2047 < points.length; _js_idx2047 += 1) {
+            p = points[_js_idx2047];
             var scale = fl / (fl + p.z + centerZ);
             p.sx = p.x * scale;
             p.sy = p.y * scale;
@@ -1034,15 +1034,15 @@ function ep26() {
     var drawLine = function () {
         var p = points[arguments[0]];
         CTX.moveTo(p.sx, p.sy);
-        var _js2354 = arguments.length - 1;
-        for (var i = 1; i <= _js2354; i += 1) {
-            var p2355 = points[arguments[i]];
-            CTX.lineTo(p2355.sx, p2355.sy);
+        var _js2048 = arguments.length - 1;
+        for (var i = 1; i <= _js2048; i += 1) {
+            var p2049 = points[arguments[i]];
+            CTX.lineTo(p2049.sx, p2049.sy);
         };
     };
     var translateModel = function (x, y, z) {
-        for (var p = null, _js_idx2355 = 0; _js_idx2355 < points.length; _js_idx2355 += 1) {
-            p = points[_js_idx2355];
+        for (var p = null, _js_idx2049 = 0; _js_idx2049 < points.length; _js_idx2049 += 1) {
+            p = points[_js_idx2049];
             p.x += x;
             p.y += y;
             p.z += z;
@@ -1050,34 +1050,34 @@ function ep26() {
         return needsUpdate = true;
     };
     var rotateX = function (angle) {
-        var cos2356 = Math.cos(angle);
-        var sin2357 = Math.sin(angle);
-        for (var p = null, _js_idx2358 = 0; _js_idx2358 < points.length; _js_idx2358 += 1) {
-            p = points[_js_idx2358];
-            p.y = p.y * cos2356 - p.z * sin2357;
-            p.z = p.z * cos2356 + p.y * sin2357;
+        var cos2050 = Math.cos(angle);
+        var sin2051 = Math.sin(angle);
+        for (var p = null, _js_idx2052 = 0; _js_idx2052 < points.length; _js_idx2052 += 1) {
+            p = points[_js_idx2052];
+            p.y = p.y * cos2050 - p.z * sin2051;
+            p.z = p.z * cos2050 + p.y * sin2051;
         };
         __PS_MV_REG = [];
         return needsUpdate = true;
     };
     var rotateY = function (angle) {
-        var cos2359 = Math.cos(angle);
-        var sin2360 = Math.sin(angle);
-        for (var p = null, _js_idx2361 = 0; _js_idx2361 < points.length; _js_idx2361 += 1) {
-            p = points[_js_idx2361];
-            p.x = p.x * cos2359 - p.z * sin2360;
-            p.z = p.z * cos2359 + p.x * sin2360;
+        var cos2053 = Math.cos(angle);
+        var sin2054 = Math.sin(angle);
+        for (var p = null, _js_idx2055 = 0; _js_idx2055 < points.length; _js_idx2055 += 1) {
+            p = points[_js_idx2055];
+            p.x = p.x * cos2053 - p.z * sin2054;
+            p.z = p.z * cos2053 + p.x * sin2054;
         };
         __PS_MV_REG = [];
         return needsUpdate = true;
     };
     var rotateZ = function (angle) {
-        var cos2362 = Math.cos(angle);
-        var sin2363 = Math.sin(angle);
-        for (var p = null, _js_idx2364 = 0; _js_idx2364 < points.length; _js_idx2364 += 1) {
-            p = points[_js_idx2364];
-            p.x = p.x * cos2362 - p.y * sin2363;
-            p.y = p.y * cos2362 + p.x * sin2363;
+        var cos2056 = Math.cos(angle);
+        var sin2057 = Math.sin(angle);
+        for (var p = null, _js_idx2058 = 0; _js_idx2058 < points.length; _js_idx2058 += 1) {
+            p = points[_js_idx2058];
+            p.x = p.x * cos2056 - p.y * sin2057;
+            p.y = p.y * cos2056 + p.x * sin2057;
         };
         __PS_MV_REG = [];
         return needsUpdate = true;
@@ -1148,10 +1148,10 @@ function ep27() {
         CTX.beginPath();
         CTX.arc(position.x, position.y, 10, 0, Math.PI * 2, false);
         CTX.fill();
-        var _ps_incr_place2365 = (target.x - position.x) * ease;
-        position.x += _ps_incr_place2365;
-        var _ps_incr_place2366 = (target.y - position.y) * ease;
-        position.y += _ps_incr_place2366;
+        var _ps_incr_place2059 = (target.x - position.x) * ease;
+        position.x += _ps_incr_place2059;
+        var _ps_incr_place2060 = (target.y - position.y) * ease;
+        position.y += _ps_incr_place2060;
         __PS_MV_REG = [];
         return requestAnimationFrame(update);
     };
@@ -1163,12 +1163,12 @@ function ep28() {
     var target = makeVector(width, Math.random() * height);
     var numPoints = 100;
     var points = (function () {
-        var collect2368 = [];
-        for (var _js2367 = 0; _js2367 < numPoints; _js2367 += 1) {
-            collect2368.push(makeVector(0, 0));
+        var collect2062 = [];
+        for (var _js2061 = 0; _js2061 < numPoints; _js2061 += 1) {
+            collect2062.push(makeVector(0, 0));
         };
         __PS_MV_REG = [];
-        return collect2368;
+        return collect2062;
     })();
     var ease = 0.5;
     document.body.addEventListener('mousemove', function (evt) {
@@ -1176,16 +1176,16 @@ function ep28() {
         return target.y = evt.clientY;
     });
     var easeTo = function (position, target, ease) {
-        var _ps_incr_place2370;
-        var _ps_incr_place2369 = (target.x - position.x) * ease;
-        position.x += _ps_incr_place2369;
-        return (_ps_incr_place2370 = (target.y - position.y) * ease, position.y += _ps_incr_place2370);
+        var _ps_incr_place2064;
+        var _ps_incr_place2063 = (target.x - position.x) * ease;
+        position.x += _ps_incr_place2063;
+        return (_ps_incr_place2064 = (target.y - position.y) * ease, position.y += _ps_incr_place2064);
     };
     function update() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
         var leader = makeVector(target.x, target.y);
-        var _js2371 = numPoints - 1;
-        for (var i = 1; i <= _js2371; i += 1) {
+        var _js2065 = numPoints - 1;
+        for (var i = 1; i <= _js2065; i += 1) {
             var point = points[i];
             easeTo(point, leader, ease);
             CTX.beginPath();
@@ -1216,16 +1216,16 @@ function ep29() {
         return (c * k) / d + b;
     };
     var easeInQuad = function (k, b, c, d) {
-        var k2372 = k / d;
-        return c * k2372 * k2372 + b;
+        var k2066 = k / d;
+        return c * k2066 * k2066 + b;
     };
     var easeOutQuad = function (k, b, c, d) {
-        var k2373 = k / d;
-        return -c * k2373 * (k2373 - 2) + b;
+        var k2067 = k / d;
+        return -c * k2067 * (k2067 - 2) + b;
     };
     var easeInOutQuad = function (k, b, c, d) {
-        var k2374 = k / (d / 2);
-        return k2374 < 1 ? (c * k2374 * k2374) / 2 + b : (c / -2) * ((k2374 - 1) * (k2374 - 3) - 1) + b;
+        var k2068 = k / (d / 2);
+        return k2068 < 1 ? (c * k2068 * k2068) / 2 + b : (c / -2) * ((k2068 - 1) * (k2068 - 3) - 1) + b;
     };
     drawCircle(start.x, start.y);
     document.body.addEventListener('click', function (evt) {
@@ -1241,9 +1241,9 @@ function ep29() {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
         var time = new Date() - startTime;
         if (time < duration) {
-            var x2375 = easeInOutQuad(time, start.x, change.x, duration);
-            var y2376 = easeInOutQuad(time, start.y, change.y, duration);
-            drawCircle(x2375, y2376);
+            var x2069 = easeInOutQuad(time, start.x, change.x, duration);
+            var y2070 = easeInOutQuad(time, start.y, change.y, duration);
+            drawCircle(x2069, y2070);
         } else {
             drawCircle(target.x, target.y);
             start.x = target.x;
@@ -1269,16 +1269,16 @@ function ep30() {
         return (c * k) / d + b;
     };
     var easeInQuad = function (k, b, c, d) {
-        var k2377 = k / d;
-        return c * k2377 * k2377 + b;
+        var k2071 = k / d;
+        return c * k2071 * k2071 + b;
     };
     var easeOutQuad = function (k, b, c, d) {
-        var k2378 = k / d;
-        return -c * k2378 * (k2378 - 2) + b;
+        var k2072 = k / d;
+        return -c * k2072 * (k2072 - 2) + b;
     };
     var easeInOutQuad = function (k, b, c, d) {
-        var k2379 = k / (d / 2);
-        return k2379 < 1 ? (c * k2379 * k2379) / 2 + b : (c / -2) * ((k2379 - 1) * (k2379 - 3) - 1) + b;
+        var k2073 = k / (d / 2);
+        return k2073 < 1 ? (c * k2073 * k2073) / 2 + b : (c / -2) * ((k2073 - 1) * (k2073 - 3) - 1) + b;
     };
     var render = function () {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
@@ -1399,8 +1399,8 @@ function ep33() {
     };
     var getClickPoint = function (x, y) {
         var points = [p0, p1, p2, p3];
-        for (var p = null, _js_idx2380 = 0; _js_idx2380 < points.length; _js_idx2380 += 1) {
-            p = points[_js_idx2380];
+        for (var p = null, _js_idx2074 = 0; _js_idx2074 < points.length; _js_idx2074 += 1) {
+            p = points[_js_idx2074];
             var dx = p.x - x;
             var dy = p.y - y;
             var dist = Math.sqrt(dx * dx + dy * dy);
@@ -1478,8 +1478,8 @@ function ep34() {
     var drawStar = function (star) {
         CTX.beginPath();
         CTX.moveTo(star.points[0].x, star.points[0].y);
-        for (var p = null, _js_arrvar2382 = star.points.slice(1), _js_idx2381 = 0; _js_idx2381 < _js_arrvar2382.length; _js_idx2381 += 1) {
-            p = _js_arrvar2382[_js_idx2381];
+        for (var p = null, _js_arrvar2076 = star.points.slice(1), _js_idx2075 = 0; _js_idx2075 < _js_arrvar2076.length; _js_idx2075 += 1) {
+            p = _js_arrvar2076[_js_idx2075];
             CTX.lineTo(p.x, p.y);
         };
         CTX.closePath();
@@ -1602,8 +1602,8 @@ function ep36() {
     var gravity = 0.5;
     var friction = 0.999;
     var updatePoints = function () {
-        for (var p = null, _js_idx2383 = 0; _js_idx2383 < points.length; _js_idx2383 += 1) {
-            p = points[_js_idx2383];
+        for (var p = null, _js_idx2077 = 0; _js_idx2077 < points.length; _js_idx2077 += 1) {
+            p = points[_js_idx2077];
             var vx = (p.x - p.oldx) * friction;
             var vy = (p.y - p.oldy) * friction;
             p.oldx = p.x;
@@ -1630,8 +1630,8 @@ function ep36() {
     };
     var renderPoints = function () {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
-        for (var p = null, _js_idx2384 = 0; _js_idx2384 < points.length; _js_idx2384 += 1) {
-            p = points[_js_idx2384];
+        for (var p = null, _js_idx2078 = 0; _js_idx2078 < points.length; _js_idx2078 += 1) {
+            p = points[_js_idx2078];
             CTX.beginPath();
             CTX.arc(p.x, p.y, 5, 0, Math.PI * 2);
             CTX.fill();
@@ -1670,8 +1670,8 @@ function ep37() {
     var gravity = 0.5;
     var friction = 0.999;
     var updatePoints = function () {
-        for (var p = null, _js_idx2385 = 0; _js_idx2385 < points.length; _js_idx2385 += 1) {
-            p = points[_js_idx2385];
+        for (var p = null, _js_idx2079 = 0; _js_idx2079 < points.length; _js_idx2079 += 1) {
+            p = points[_js_idx2079];
             var vx = (p.x - p.oldx) * friction;
             var vy = (p.y - p.oldy) * friction;
             p.oldx = p.x;
@@ -1681,8 +1681,8 @@ function ep37() {
         };
     };
     var constraintPoints = function () {
-        for (var p = null, _js_idx2386 = 0; _js_idx2386 < points.length; _js_idx2386 += 1) {
-            p = points[_js_idx2386];
+        for (var p = null, _js_idx2080 = 0; _js_idx2080 < points.length; _js_idx2080 += 1) {
+            p = points[_js_idx2080];
             var vx = (p.x - p.oldx) * friction;
             var vy = (p.y - p.oldy) * friction;
             if (p.x > width) {
@@ -1704,8 +1704,8 @@ function ep37() {
         };
     };
     var updateSticks = function () {
-        for (var s = null, _js_idx2387 = 0; _js_idx2387 < sticks.length; _js_idx2387 += 1) {
-            s = sticks[_js_idx2387];
+        for (var s = null, _js_idx2081 = 0; _js_idx2081 < sticks.length; _js_idx2081 += 1) {
+            s = sticks[_js_idx2081];
             var dx = s.p1.x - s.p0.x;
             var dy = s.p1.y - s.p0.y;
             var dist = Math.sqrt(dx * dx + dy * dy);
@@ -1721,8 +1721,8 @@ function ep37() {
     };
     var renderPoints = function () {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
-        for (var p = null, _js_idx2388 = 0; _js_idx2388 < points.length; _js_idx2388 += 1) {
-            p = points[_js_idx2388];
+        for (var p = null, _js_idx2082 = 0; _js_idx2082 < points.length; _js_idx2082 += 1) {
+            p = points[_js_idx2082];
             CTX.beginPath();
             CTX.arc(p.x, p.y, 5, 0, Math.PI * 2);
             CTX.fill();
@@ -1730,8 +1730,8 @@ function ep37() {
     };
     var renderSticks = function () {
         CTX.beginPath();
-        for (var s = null, _js_idx2389 = 0; _js_idx2389 < sticks.length; _js_idx2389 += 1) {
-            s = sticks[_js_idx2389];
+        for (var s = null, _js_idx2083 = 0; _js_idx2083 < sticks.length; _js_idx2083 += 1) {
+            s = sticks[_js_idx2083];
             CTX.moveTo(s.p0.x, s.p0.y);
             CTX.lineTo(s.p1.x, s.p1.y);
         };
@@ -1763,7 +1763,7 @@ function ep37() {
                 });
     function update() {
         updatePoints();
-        for (var _js2390 = 0; _js2390 < 3; _js2390 += 1) {
+        for (var _js2084 = 0; _js2084 < 3; _js2084 += 1) {
             updateSticks();
             constraintPoints();
         };
@@ -1801,8 +1801,8 @@ function ep38() {
     var gravity = 0.5;
     var friction = 0.999;
     var updatePoints = function () {
-        for (var p = null, _js_idx2391 = 0; _js_idx2391 < points.length; _js_idx2391 += 1) {
-            p = points[_js_idx2391];
+        for (var p = null, _js_idx2085 = 0; _js_idx2085 < points.length; _js_idx2085 += 1) {
+            p = points[_js_idx2085];
             var vx = (p.x - p.oldx) * friction;
             var vy = (p.y - p.oldy) * friction;
             p.oldx = p.x;
@@ -1812,8 +1812,8 @@ function ep38() {
         };
     };
     var constraintPoints = function () {
-        for (var p = null, _js_idx2392 = 0; _js_idx2392 < points.length; _js_idx2392 += 1) {
-            p = points[_js_idx2392];
+        for (var p = null, _js_idx2086 = 0; _js_idx2086 < points.length; _js_idx2086 += 1) {
+            p = points[_js_idx2086];
             var vx = (p.x - p.oldx) * friction;
             var vy = (p.y - p.oldy) * friction;
             if (p.x > width) {
@@ -1835,8 +1835,8 @@ function ep38() {
         };
     };
     var updateSticks = function () {
-        for (var s = null, _js_idx2393 = 0; _js_idx2393 < sticks.length; _js_idx2393 += 1) {
-            s = sticks[_js_idx2393];
+        for (var s = null, _js_idx2087 = 0; _js_idx2087 < sticks.length; _js_idx2087 += 1) {
+            s = sticks[_js_idx2087];
             var dx = s.p1.x - s.p0.x;
             var dy = s.p1.y - s.p0.y;
             var dist = Math.sqrt(dx * dx + dy * dy);
@@ -1851,16 +1851,16 @@ function ep38() {
         };
     };
     var renderPoints = function () {
-        for (var p = null, _js_idx2394 = 0; _js_idx2394 < points.length; _js_idx2394 += 1) {
-            p = points[_js_idx2394];
+        for (var p = null, _js_idx2088 = 0; _js_idx2088 < points.length; _js_idx2088 += 1) {
+            p = points[_js_idx2088];
             CTX.beginPath();
             CTX.arc(p.x, p.y, 5, 0, Math.PI * 2);
             CTX.fill();
         };
     };
     var renderSticks = function () {
-        for (var s = null, _js_idx2395 = 0; _js_idx2395 < sticks.length; _js_idx2395 += 1) {
-            s = sticks[_js_idx2395];
+        for (var s = null, _js_idx2089 = 0; _js_idx2089 < sticks.length; _js_idx2089 += 1) {
+            s = sticks[_js_idx2089];
             if (!s.hidden) {
                 CTX.beginPath();
                 CTX.strokeStyle = s.color ? s.color : 'black';
@@ -1872,21 +1872,21 @@ function ep38() {
         };
     };
     var renderForms = function () {
-        for (var form = null, _js_idx2396 = 0; _js_idx2396 < forms.length; _js_idx2396 += 1) {
-            form = forms[_js_idx2396];
+        for (var form = null, _js_idx2090 = 0; _js_idx2090 < forms.length; _js_idx2090 += 1) {
+            form = forms[_js_idx2090];
             CTX.beginPath();
             CTX.fillStyle = form.color;
             CTX.moveTo(form.path[0].x, form.path[0].y);
-            var _js2397 = form.path.length - 1;
-            for (var i = 1; i <= _js2397; i += 1) {
+            var _js2091 = form.path.length - 1;
+            for (var i = 1; i <= _js2091; i += 1) {
                 CTX.lineTo(form.path[i].x, form.path[i].y);
             };
             CTX.fill();
         };
     };
     var renderImages = function () {
-        for (var img = null, _js_idx2397 = 0; _js_idx2397 < images.length; _js_idx2397 += 1) {
-            img = images[_js_idx2397];
+        for (var img = null, _js_idx2091 = 0; _js_idx2091 < images.length; _js_idx2091 += 1) {
+            img = images[_js_idx2091];
             var p0 = img.path[0];
             var p1 = img.path[1];
             var p3 = img.path[3];
@@ -1938,7 +1938,7 @@ function ep38() {
     images.push({ path : [p0, p1, p2, p3], img : loadImage('https://picsum.photos/id/1074/320/240') });
     function update() {
         updatePoints();
-        for (var _js2398 = 0; _js2398 < 3; _js2398 += 1) {
+        for (var _js2092 = 0; _js2092 < 3; _js2092 += 1) {
             updateSticks();
             constraintPoints();
         };
@@ -1997,8 +1997,8 @@ function ep39() {
         return engine.angle += engine.speed;
     };
     var updatePoints = function () {
-        for (var p = null, _js_idx2399 = 0; _js_idx2399 < points.length; _js_idx2399 += 1) {
-            p = points[_js_idx2399];
+        for (var p = null, _js_idx2093 = 0; _js_idx2093 < points.length; _js_idx2093 += 1) {
+            p = points[_js_idx2093];
             if (!p.pinned) {
                 var vx = (p.x - p.oldx) * friction;
                 var vy = (p.y - p.oldy) * friction;
@@ -2010,8 +2010,8 @@ function ep39() {
         };
     };
     var constraintPoints = function () {
-        for (var p = null, _js_idx2400 = 0; _js_idx2400 < points.length; _js_idx2400 += 1) {
-            p = points[_js_idx2400];
+        for (var p = null, _js_idx2094 = 0; _js_idx2094 < points.length; _js_idx2094 += 1) {
+            p = points[_js_idx2094];
             if (!p.pinned) {
                 var vx = (p.x - p.oldx) * friction;
                 var vy = (p.y - p.oldy) * friction;
@@ -2035,8 +2035,8 @@ function ep39() {
         };
     };
     var updateSticks = function () {
-        for (var s = null, _js_idx2401 = 0; _js_idx2401 < sticks.length; _js_idx2401 += 1) {
-            s = sticks[_js_idx2401];
+        for (var s = null, _js_idx2095 = 0; _js_idx2095 < sticks.length; _js_idx2095 += 1) {
+            s = sticks[_js_idx2095];
             var dx = s.p1.x - s.p0.x;
             var dy = s.p1.y - s.p0.y;
             var dist = Math.sqrt(dx * dx + dy * dy);
@@ -2056,8 +2056,8 @@ function ep39() {
     };
     var renderPoints = function () {
         CTX.clearRect(0, 0, WIDTH, HEIGHT);
-        for (var p = null, _js_idx2402 = 0; _js_idx2402 < points.length; _js_idx2402 += 1) {
-            p = points[_js_idx2402];
+        for (var p = null, _js_idx2096 = 0; _js_idx2096 < points.length; _js_idx2096 += 1) {
+            p = points[_js_idx2096];
             CTX.beginPath();
             CTX.arc(p.x, p.y, 5, 0, Math.PI * 2);
             CTX.fill();
@@ -2065,8 +2065,8 @@ function ep39() {
     };
     var renderSticks = function () {
         CTX.beginPath();
-        for (var s = null, _js_idx2403 = 0; _js_idx2403 < sticks.length; _js_idx2403 += 1) {
-            s = sticks[_js_idx2403];
+        for (var s = null, _js_idx2097 = 0; _js_idx2097 < sticks.length; _js_idx2097 += 1) {
+            s = sticks[_js_idx2097];
             CTX.moveTo(s.p0.x, s.p0.y);
             CTX.lineTo(s.p1.x, s.p1.y);
         };
@@ -2121,7 +2121,7 @@ function ep39() {
     function update() {
         updateEngine();
         updatePoints();
-        for (var _js2404 = 0; _js2404 < 3; _js2404 += 1) {
+        for (var _js2098 = 0; _js2098 < 3; _js2098 += 1) {
             updateSticks();
             constraintPoints();
         };
@@ -2134,4 +2134,44 @@ function ep39() {
     __PS_MV_REG = [];
     return update();
 };
-window.onload = ep39;
+/** Fractal Trees */
+function ep40() {
+    var branchAngleA = randomRange(0, Math.PI / -2);
+    var tree = function (x, y, size, angle, limit) {
+        CTX.save();
+        CTX.translate(x, y);
+        CTX.rotate(angle);
+        CTX.fillRect(0, 0, size, -size);
+        var x0 = 0;
+        var y0 = -size;
+        var size0 = Math.abs(Math.cos(branchAngleA) * size);
+        var angle0 = branchAngleA;
+        if (limit > 0) {
+            tree(x0, y0, size0, angle0, limit - 1);
+        } else {
+            CTX.save();
+            CTX.translate(x0, y0);
+            CTX.rotate(angle0);
+            CTX.fillRect(0, 0, size0, -size0);
+            CTX.restore();
+        };
+        var x1 = x0 + Math.cos(angle0) * size0;
+        var y1 = y0 + Math.sin(angle0) * size0;
+        var size1 = Math.abs(Math.sin(branchAngleA) * size);
+        var angle1 = angle0 + Math.PI / 2;
+        if (limit > 0) {
+            tree(x1, y1, size1, angle1, limit - 1);
+        } else {
+            CTX.save();
+            CTX.translate(x1, y1);
+            CTX.rotate(angle1);
+            CTX.fillRect(0, 0, size1, -size1);
+            CTX.restore();
+        };
+        __PS_MV_REG = [];
+        return CTX.restore();
+    };
+    __PS_MV_REG = [];
+    return tree(width / 2 - 75, height, 150, 0, 8);
+};
+window.onload = ep40;

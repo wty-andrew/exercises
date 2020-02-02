@@ -1662,4 +1662,36 @@
         (render-engine))
       (update))))
 
-(setf (@ window onload) ep-39)
+(defun ep-40 ()
+  "Fractal Trees"
+  (let ((branch-angle-a (random-range 0 (/ pi -2))))
+    (labels ((tree (x y size angle limit)
+               (with-context
+                 (ctx translate x y)
+                 (ctx rotate angle)
+                 (ctx fill-rect 0 0 size (- size))
+                 (let ((x0 0)
+                       (y0 (- size))
+                       (size0 (abs (* (cos branch-angle-a) size)))
+                       (angle0 branch-angle-a))
+                   (if (> limit 0)
+                       (tree x0 y0 size0 angle0 (- limit 1))
+                       (progn
+                         (with-context
+                           (ctx translate x0 y0)
+                           (ctx rotate angle0)
+                           (ctx fill-rect 0 0 size0 (- size0)))))
+                   (let ((x1 (+ x0 (* (cos angle0) size0)))
+                         (y1 (+ y0 (* (sin angle0) size0)))
+                         (size1 (abs (* (sin branch-angle-a) size)))
+                         (angle1 (+ angle0 (/ pi 2))))
+                     (if (> limit 0)
+                         (tree x1 y1 size1 angle1 (- limit 1))
+                         (progn
+                           (with-context
+                             (ctx translate x1 y1)
+                             (ctx rotate angle1)
+                             (ctx fill-rect 0 0 size1 (- size1))))))))))
+      (tree (- (/ width 2) 75) height 150 0 8))))
+
+(setf (@ window onload) ep-40)
