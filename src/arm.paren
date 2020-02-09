@@ -1,0 +1,26 @@
+(defun make-arm (x y length angle)
+  (create x x
+          y y
+          length length
+          angle angle
+          parent null))
+
+(defun arm-end-x (arm)
+  (with-slots (x angle length parent) arm
+    (let ((angle angle)
+          (parent parent))
+      (do ()
+          ((null parent) (+ x (* (cos angle) length)))
+        (incf angle (@ parent angle))
+        (setf parent (@ parent parent))))))
+
+(defun arm-end-y (arm)
+  (with-slots (y angle length parent) arm
+    (let ((angle angle)
+          (parent parent))
+      (do ()
+          ((null parent) (+ y (* (sin angle) length)))
+        (incf angle (@ parent angle))
+        (setf parent (@ parent parent))))))
+
+(exports make-arm arm-end-x arm-end-y)

@@ -5,6 +5,7 @@ module.exports = {
     utils: './src/utils.js',
     vector: './src/vector.js',
     particle: './src/particle.js',
+    arm: './src/arm.js',
     index: './src/index.js',
   },
   output: {
