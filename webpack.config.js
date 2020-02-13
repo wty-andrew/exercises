@@ -6,6 +6,7 @@ module.exports = {
     vector: './src/vector.js',
     particle: './src/particle.js',
     arm: './src/arm.js',
+    fksystem: './src/fksystem.js',
     index: './src/index.js',
   },
   output: {

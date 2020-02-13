@@ -57,6 +57,10 @@
   (ctx line-to (arm-end-x arm) (arm-end-y arm))
   (ctx stroke))
 
+(defun render-fk-system (fk-system)
+  (dolist (arm (@ fk-system arms))
+    (render-arm arm)))
+
 (defun ep-1 ()
   "Introduction"
   (dotimes (_ 100)
@@ -1840,12 +1844,16 @@
 
 (defun ep-43 ()
   "Kinematics Part I"
-  (let* ((arm (make-arm (/ width 2) (/ height 2) 100 0))
-         (arm2 (make-arm (arm-end-x arm) (arm-end-y arm) 100 1.3))
-         (arm3 (make-arm (arm-end-x arm2) (arm-end-y arm2) 100 1.3))
+  (let* ((arm (make-arm 100 0 0 0))
+         (arm2 (make-arm 100 0 0 0))
+         (arm3 (make-arm 100 0 0 0))
          (angle 0))
-    (setf (@ arm2 parent) arm
-          (@ arm3 parent) arm2)
+    (with-slots (x y length angle) arm
+      (setf x (/ width 2) y (/ height 2) angle 0))
+    (with-slots (x y length angle parent) arm2
+      (setf x (arm-end-x arm) y (arm-end-y arm) angle 1.3 parent arm))
+    (with-slots (x y length angle parent) arm3
+      (setf x (arm-end-x arm2) y (arm-end-y arm2) angle 1.3 parent arm2))
     (def-animation-loop update
       (clear)
       (setf (@ arm angle) (* (sin angle) 1.2)
@@ -1861,4 +1869,21 @@
       (render-arm arm3))
     (update)))
 
-(setf (@ window onload) ep-43)
+(defun ep-44 ()
+  "Kinematics Part II"
+  (let ((leg0 (make-fk-system (/ width 2) (/ height 2)))
+        (leg1 (make-fk-system (/ width 2) (/ height 2))))
+    (setf (@ leg1 phase) pi)
+    (fk-system-add-arm! leg0 200 (/ pi 2) (/ pi 4) 0)
+    (fk-system-add-arm! leg0 180 0.87 0.87 -1.5)
+    (fk-system-add-arm! leg1 200 (/ pi 2) (/ pi 4) 0)
+    (fk-system-add-arm! leg1 180 0.87 0.87 -1.5)
+    (def-animation-loop update
+      (clear)
+      (fk-system-update! leg0)
+      (render-fk-system leg0)
+      (fk-system-update! leg1)
+      (render-fk-system leg1))
+    (update)))
+
+(setf (@ window onload) ep-44)

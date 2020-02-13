@@ -1,0 +1,32 @@
+(defun make-fk-system (x y)
+  (create arms (array)
+          last-arm null
+          x x
+          y y
+          phase 0
+          speed 0.05))
+
+(defun fk-system-update! (fk-system)
+  (with-slots (arms phase speed) fk-system
+    (dolist (arm arms)
+      (setf (arm-phase arm) phase)
+      (with-slots (x y parent) arm
+        (if parent
+            (setf x (arm-end-x parent)
+                  y (arm-end-y parent))
+            (setf x (@ fk-system x)
+                  y (@ fk-system y)))))
+    (incf phase speed)))
+
+(defun fk-system-add-arm! (fk-system length center-angle rotation-range phase-offset)
+  (let ((arm (make-arm length center-angle rotation-range phase-offset)))
+    (with-slots (arms last-arm) fk-system
+      (chain arms (push arm))
+      (setf (@ arm parent) last-arm
+            last-arm arm)))
+  (fk-system-update! fk-system))
+
+(defun fk-system-rotate-arm! (fk-system index angle)
+  (setf (@ (aref (@ fk-system arms) index) angle) angle))
+
+(exports make-fk-system fk-system-update! fk-system-add-arm! fk-system-rotate-arm!)

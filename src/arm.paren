@@ -1,9 +1,12 @@
-(defun make-arm (x y length angle)
-  (create x x
-          y y
+(defun make-arm (length center-angle rotation-range phase-offset)
+  (create x 0
+          y 0
           length length
-          angle angle
-          parent null))
+          angle 0
+          center-angle center-angle
+          rotation-range rotation-range
+          parent null
+          phase-offset phase-offset))
 
 (defun arm-end-x (arm)
   (with-slots (x angle length parent) arm
@@ -22,5 +25,9 @@
           ((null parent) (+ y (* (sin angle) length)))
         (incf angle (@ parent angle))
         (setf parent (@ parent parent))))))
+
+(defsetf arm-phase (arm) (phase)
+  `(with-slots (angle center-angle rotation-range phase-offset) arm
+     (setf angle (+ center-angle (* (sin (+ phase phase-offset)) rotation-range)))))
 
 (exports make-arm arm-end-x arm-end-y)

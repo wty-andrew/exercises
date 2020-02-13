@@ -29,4 +29,5 @@
             (:script :type "text/javascript" :src "http://localhost:3000/vector.js")
             (:script :type "text/javascript" :src "http://localhost:3000/particle.js")
             (:script :type "text/javascript" :src "http://localhost:3000/arm.js")
+            (:script :type "text/javascript" :src "http://localhost:3000/fksystem.js")
             (:script :type "text/javascript" :src "http://localhost:3000/index.js")))))
