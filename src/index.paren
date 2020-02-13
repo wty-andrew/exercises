@@ -61,6 +61,16 @@
   (dolist (arm (@ fk-system arms))
     (render-arm arm)))
 
+(defun render-ik-system (ik-system)
+  (dolist (arm (@ ik-system arms))
+    (with-slots (x y angle length) arm
+      (setf (ctx-get stroke-style) "#000000"
+            (ctx-get line-width) 5)
+      (ctx begin-path)
+      (ctx move-to x y)
+      (ctx line-to (+ x (* (cos angle) length)) (+ y (* (sin angle) length)))
+      (ctx stroke))))
+
 (defun ep-1 ()
   "Introduction"
   (dotimes (_ 100)
@@ -1886,4 +1896,41 @@
       (render-fk-system leg1))
     (update)))
 
-(setf (@ window onload) ep-44)
+(defun ep-45 ()
+  "Kinematics Part III"
+  (let* ((ik-system (make-ik-system (/ width 2) (/ height 2))))
+    (dotimes (_ 20)
+      (ik-system-add-arm! ik-system 30))
+    (chain document body (add-event-listener
+                          "mousemove"
+                          #'(lambda (evt)
+                              (drag-arm (@ ik-system last-arm) (@ evt client-x) (@ evt client-y)))))
+    (def-animation-loop update
+      (clear)
+      (render-ik-system ik-system))
+    (update)))
+
+(defun ep-46 ()
+  "Kinematics Part IV"
+  (let* ((ik-system1 (make-ik-system 250 height))
+         (ik-system2 (make-ik-system (- width 250) height))
+         (ball (make-particle 100 100 5 0 0.25)))
+    (setf (particle-radius ball) 20)
+    (ik-system-add-arm! ik-system1 240)
+    (ik-system-add-arm! ik-system1 180)
+    (ik-system-add-arm! ik-system1 120)
+    (ik-system-add-arm! ik-system2 240)
+    (ik-system-add-arm! ik-system2 180)
+    (ik-system-add-arm! ik-system2 120)
+    (def-animation-loop update
+      (clear)
+      (particle-update! ball)
+      (draw-particle ball)
+      (bounce ball)
+      (ik-system-reach ik-system1 (particle-x ball) (particle-y ball))
+      (ik-system-reach ik-system2 (particle-x ball) (particle-y ball))
+      (render-ik-system ik-system1)
+      (render-ik-system ik-system2))
+    (update)))
+
+(setf (@ window onload) ep-46)

@@ -8,10 +8,10 @@ function makeFkSystem(x, y) {
            };
 };
 function fkSystemUpdatebang(fkSystem) {
-    for (var arm = null, _js_idx3181 = 0; _js_idx3181 < fkSystem.arms.length; _js_idx3181 += 1) {
-        arm = fkSystem.arms[_js_idx3181];
-        var _js3183 = arm;
-        var _js3182 = fkSystem.phase;
+    for (var arm = null, _js_idx19 = 0; _js_idx19 < fkSystem.arms.length; _js_idx19 += 1) {
+        arm = fkSystem.arms[_js_idx19];
+        var _js21 = arm;
+        var _js20 = fkSystem.phase;
         arm.angle = arm.centerAngle + Math.sin(fkSystem.phase + arm.phaseOffset) * arm.rotationRange;
         if (arm.parent) {
             arm.x = armEndX(arm.parent);

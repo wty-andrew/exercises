@@ -30,4 +30,48 @@
   `(with-slots (angle center-angle rotation-range phase-offset) arm
      (setf angle (+ center-angle (* (sin (+ phase phase-offset)) rotation-range)))))
 
-(exports make-arm arm-end-x arm-end-y)
+(defmacro arm-x (arm)
+  `(@ ,arm x))
+
+(defsetf arm-x (arm) (value)
+  `(setf (@ ,arm x) ,value))
+
+(defmacro arm-y (arm)
+  `(@ ,arm y))
+
+(defsetf arm-y (arm) (value)
+  `(setf (@ ,arm y) ,value))
+
+(defmacro arm-length (arm)
+  `(@ ,arm length))
+
+(defsetf arm-length (arm) (value)
+  `(setf (@ ,arm length) ,value))
+
+(defmacro arm-angle (arm)
+  `(@ ,arm angle))
+
+(defsetf arm-angle (arm) (value)
+  `(setf (@ ,arm angle) ,value))
+
+(defmacro arm-parent (arm)
+  `(@ ,arm parent))
+
+(defsetf arm-parent (arm) (value)
+  `(setf (@ ,arm parent) ,value))
+
+(defsetf arm-point-at (arm) (point)
+  `(with-slots (x y angle) ,arm
+     (let ((dx (- (@ ,point x) x))
+           (dy (- (@ ,point y) y)))
+       (setf angle (chain *math (atan2 dy dx))))))
+
+(defun drag-arm (arm x y)
+  (with-slots (angle length parent) arm
+    (setf (arm-point-at arm) (create x x y y)
+          (arm-x arm) (- x (* (cos angle) length))
+          (arm-y arm) (- y (* (sin angle) length)))
+    (when parent
+      (drag-arm parent (arm-x arm) (arm-y arm)))))
+
+(exports make-arm arm-end-x arm-end-y drag-arm)

@@ -7,6 +7,7 @@ module.exports = {
     particle: './src/particle.js',
     arm: './src/arm.js',
     fksystem: './src/fksystem.js',
+    iksystem: './src/iksystem.js',
     index: './src/index.js',
   },
   output: {
