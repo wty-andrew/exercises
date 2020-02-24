@@ -21,8 +21,8 @@ function ikSystemAddArmbang(ikSystem, length) {
 };
 function ikSystemReach(ikSystem, x, y) {
     dragArm(ikSystem.lastArm, x, y);
-    for (var arm = null, _js_idx259 = 0; _js_idx259 < ikSystem.arms.length; _js_idx259 += 1) {
-        arm = ikSystem.arms[_js_idx259];
+    for (var arm = null, _js_idx20 = 0; _js_idx20 < ikSystem.arms.length; _js_idx20 += 1) {
+        arm = ikSystem.arms[_js_idx20];
         if (arm.parent) {
             arm.x = arm.parent.x + Math.cos(arm.parent.angle) * arm.parent.length;
             arm.y = arm.parent.y + Math.sin(arm.parent.angle) * arm.parent.length;

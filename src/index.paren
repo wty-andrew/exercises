@@ -1933,4 +1933,40 @@
       (render-ik-system ik-system2))
     (update)))
 
-(setf (@ window onload) ep-46)
+(defun ep-47 ()
+  "Weighted Random"
+  (let ((prizes (array
+                 (create prize "nothing!" chance 8)
+                 (create prize "a gold piece" chance 5)
+                 (create prize "a treasure chest" chance 2)
+                 (create prize "poison" chance 1)
+                 (create prize "food" chance 3))))
+    (labels ((get-prize ()
+               (let* ((total (chain prizes (reduce #'(lambda (acc cur)
+                                                       (+ acc (@ cur chance))) 0)))
+                      (rand (* (random) total)))
+                 (dolist (prize prizes)
+                   (if (< rand (@ prize chance))
+                       (return (@ prize prize))
+                       (decf rand (@ prize chance))))))))
+    (chain document body
+           (add-event-listener "click"
+                               #'(lambda ()
+                                   (chain console (log (concat-string "You won " (get-prize)))))))))
+
+(defun ep-48 ()
+  "Matrix Math Part I")
+
+(defun ep-49 ()
+  "Matrix Math Part II"
+  (let* ((angle (/ pi 4))
+         (cos (cos angle))
+         (sin (sin angle))
+         (sx 2)
+         (sy 1))
+    (ctx set-transform (* cos sx) (* sin sy) (* (- sin) sx) (* cos sy) 500 100)
+    (ctx fill-rect 0 0 100 100)
+    (ctx set-transform (* cos sx) (* sin sx) (* (- sin) sy) (* cos sy) 500 300)
+    (ctx fill-rect 0 0 100 100)))
+
+(setf (@ window onload) ep-49)
