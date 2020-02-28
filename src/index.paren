@@ -1969,4 +1969,41 @@
     (ctx set-transform (* cos sx) (* sin sx) (* (- sin) sy) (* cos sy) 500 300)
     (ctx fill-rect 0 0 100 100)))
 
-(setf (@ window onload) ep-49)
+(defun ep-50 ()
+  "IFS Fractals"
+  (let ((rules (array
+                (create a 0.85 b 0.04 c -0.04 d 0.85
+                        tx 0 ty 1.6
+                        weight 0.85 color "red")
+                (create a -0.15 b 0.28 c 0.26 d 0.24
+                        tx 0 ty 0.44
+                        weight 0.07 color "green")
+                (create a 0.2 b -0.26 c 0.23 d
+                        0.22 tx 0 ty 1.6
+                        weight 0.07 color "blue")
+                (create a 0 b 0 c 0 d 0.16
+                        tx 0 ty 0
+                        weight 0.01 color "yellow")))
+        (x (random))
+        (y (random)))
+    (labels ((get-rule ()
+               (let ((rand (random)))
+                 (dolist (rule rules)
+                   (when (< rand (@ rule weight))
+                     (return rule))
+                   (decf rand (@ rule weight)))))
+             (plot (x y color)
+               (setf (ctx-get fill-style) color)
+               (ctx fill-rect (* x 50) (* y -50) 0.5 0.5)))
+      (def-animation-loop iterate
+        (dotimes (_ 100)
+          (let ((rule (get-rule)))
+            (with-slots (a b c d tx ty color) rule
+              (let ((x1 (+ (* x a) (* y b) tx))
+                    (y1 (+ (* x c) (* y d) ty)))
+                (setf x x1 y y1)
+                (plot x y color))))))
+      (ctx translate (/ width 2) height)
+      (iterate))))
+
+(setf (@ window onload) ep-50)
