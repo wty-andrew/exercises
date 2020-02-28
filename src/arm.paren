@@ -27,7 +27,7 @@
         (setf parent (@ parent parent))))))
 
 (defsetf arm-phase (arm) (phase)
-  `(with-slots (angle center-angle rotation-range phase-offset) arm
+  `(with-slots (angle center-angle rotation-range phase-offset) ,arm
      (setf angle (+ center-angle (* (sin (+ phase phase-offset)) rotation-range)))))
 
 (defmacro arm-x (arm)

@@ -12,7 +12,7 @@ function fkSystemUpdatebang(fkSystem) {
         arm = fkSystem.arms[_js_idx19];
         var _js21 = arm;
         var _js20 = fkSystem.phase;
-        arm.angle = arm.centerAngle + Math.sin(fkSystem.phase + arm.phaseOffset) * arm.rotationRange;
+        _js21.angle = _js21.centerAngle + Math.sin(fkSystem.phase + _js21.phaseOffset) * _js21.rotationRange;
         if (arm.parent) {
             arm.x = armEndX(arm.parent);
             arm.y = armEndY(arm.parent);

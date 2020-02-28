@@ -1952,7 +1952,7 @@
     (chain document body
            (add-event-listener "click"
                                #'(lambda ()
-                                   (chain console (log (concat-string "You won " (get-prize)))))))))
+                                   (chain console (log (stringify "You won " (get-prize)))))))))
 
 (defun ep-48 ()
   "Matrix Math Part I")
