@@ -2163,4 +2163,64 @@
       (chain document (add-event-listener "mousedown" #'on-mouse-down))
       (draw))))
 
-(setf (@ window onload) ep-54)
+(defun ep-55 ()
+  "Aspect Ratio"
+  (let ((w 640)
+        (h 640)
+        (scale-mode "showAll")
+        (img (chain document (create-element "img"))))
+    (labels ((get-width-first (scale-mode img-aspect-ratio container-aspect-ratio)
+               (if (eq scale-mode "showAll")
+                   (> img-aspect-ratio container-aspect-ratio)
+                   (< img-aspect-ratio container-aspect-ratio)))
+             (on-image-load ()
+               (let* (img-width
+                      img-height
+                      (img-aspect-ratio (/ (@ img width) (@ img height)))
+                      (container-aspect-ratio (/ w h))
+                      (width-first (get-width-first scale-mode
+                                                    img-aspect-ratio
+                                                    container-aspect-ratio)))
+                 (if width-first
+                     (setf img-width w
+                           img-height (/ img-width img-aspect-ratio))
+                     (setf img-height h
+                           img-width (* img-height img-aspect-ratio)))
+                 (ctx draw-image img 0 0 (@ img natural-width) (@ img natural-height)
+                      (/ (- w img-width) 2) (/ (- h img-height) 2)
+                      img-width img-height))))
+      (setf (@ *canvas* width) w
+            (@ *canvas* height) h)
+      (ctx fill-rect 0 0 w h)
+      (chain img (add-event-listener "load" #'on-image-load))
+      (setf (@ img src) "http://codingmath.com/raccoons.jpg"))))
+
+(defun ep-56 ()
+  "Box Layout"
+  (let ((items (array)))
+    (labels ((hbox (items spacing alignment wrap)
+               (let ((x spacing)
+                     (y spacing)
+                     (max-height (chain items
+                                        (reduce #'(lambda (curr-max item)
+                                                    (max curr-max (@ item h)))
+                                                0)))
+                     (ypos 0))
+                 (dolist (item items)
+                   (when (and wrap (> (+ x (@ item w) spacing) 600))
+                     (setf x spacing
+                           y (+ y max-height spacing)))
+                   (case alignment
+                     ("bottom" (setf ypos (- max-height (@ item h))))
+                     ("center" (setf ypos (/ (- max-height (@ item h)) 2))))
+                   (ctx fill-rect x (+ y ypos) (@ item w) (@ item h))
+                   (incf x (+ (@ item w) spacing))))))
+      (setf (ctx-get fill-style) "#cccccc")
+      (ctx fill-rect 0 0 600 600)
+      (setf (ctx-get fill-style) "black")
+      (dotimes (_ 35)
+        (chain items (push (create w (+ 20 (* (random) 80))
+                                   h (+ 20 (* (random) 80))))))
+      (hbox items 10 "center" t))))
+
+(setf (@ window onload) ep-56)
