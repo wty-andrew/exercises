@@ -1,0 +1,136 @@
+(defmacro exports (&rest args)
+  "Make args available in global scope."
+  `(setf ,@(mapcan #'(lambda (arg)
+                       `((chain window ,arg) ,arg))
+                   args)))
+
+;; canvas
+(defmacro ctx (fn &rest args)
+  `(chain *ctx* (,fn ,@args)))
+
+(defmacro ctx-get (attr)
+  `(@ *ctx* ,attr))
+
+(defmacro clear ()
+  `(ctx clear-rect 0 0 *width* *height*))
+
+(defmacro with-context (&body body)
+  `(progn
+     (ctx save)
+     ,@body
+     (ctx restore)))
+
+(defmacro def-animation-loop (name &body body)
+  `(defun ,name ()
+     ,@body
+     (request-animation-frame ,name)))
+
+;; misc
+(defun norm (value min max)
+  (/ (- value min) (- max min)))
+
+(defun lerp (norm min max)
+  (+ (* (- max min) norm) min))
+
+(defun map (value source-min source-max dest-min dest-max)
+  (lerp (norm value source-min source-max) dest-min dest-max))
+
+(defun clamp (value min max)
+  (min (max value (min min max)) (max min max)))
+
+(defun distance-xy (x0 y0 x1 y1)
+  (let ((dx (- x1 x0))
+        (dy (- y1 y0)))
+    (sqrt (+ (* dx dx) (* dy dy)))))
+
+(defun distance (a b)
+  (distance-xy (@ a x) (@ a y) (@ b x) (@ b y)))
+
+(defun angle-between (a b)
+  (chain *math (atan2 (- (@ b y) (@ a y))
+                      (- (@ b x) (@ a x)))))
+
+(defun circle-collision (c0 c1)
+  (<= (distance c0 c1) (+ (@ c0 radius) (@ c1 radius))))
+
+(defun circle-point-collision (x y circle)
+  (with-slots ((circle-x x) (circle-y y) radius) circle
+    (< (distance-xy x y circle-x circle-y) radius)))
+
+(defun point-in-rect (x y rect)
+  (with-slots ((rect-x x) (rect-y y) width height) rect
+    (and (in-range x rect-x (+ rect-x width))
+         (in-range y rect-y (+ rect-y height)))))
+
+(defun in-range (value min max)
+  (and (>= value (min min max))
+       (<= value (max min max))))
+
+(defun range-intersect (min0 max0 min1 max1)
+  (and (>= (max min0 max0) (min min1 max1))
+       (<= (min min0 max0) (max min1 max1))))
+
+(defun rect-intersect (r0 r1)
+  (with-slots ((r0-x x) (r0-y y) (r0-width width) (r0-height height)) r0
+    (with-slots ((r1-x x) (r1-y y) (r1-width width) (r1-height height)) r1
+      (and (range-intersect r0-x (+ r0-x r0-width) r1-x (+ r1-x r1-width))
+           (range-intersect r0-y (+ r0-y r0-height) r1-y (+ r1-y r1-height))))))
+
+(defun degree->rad (deg)
+  (* (/ deg 180) pi))
+
+(defun rad->degree(rad)
+  (/ (* rad 180) pi))
+
+(defun random-range (min max)
+  (lerp (random) min max))
+
+(defun random-int (min max)
+  (floor (random-range min (1+ max))))
+
+(defun quadratic-bezier (p0 p1 p2 k &optional (p-final (create)))
+  (with-slots (x y) p-final
+    (setf x (+ (* (chain *math (pow (- 1 k) 2)) (@ p0 x))
+               (* (- 1 k) 2 k (@ p1 x))
+               (* k k (@ p2 x)))
+          y (+ (* (chain *math (pow (- 1 k) 2)) (@ p0 y))
+               (* (- 1 k) 2 k (@ p1 y))
+               (* k k (@ p2 y)))))
+  p-final)
+
+(defun cubic-bezier (p0 p1 p2 p3 k &optional (p-final (create)))
+  (with-slots (x y) p-final
+    (setf x (+ (* (chain *math (pow (- 1 k) 3)) (@ p0 x))
+               (* (chain *math (pow (- 1 k) 2)) 3 k (@ p1 x))
+               (* (- 1 k) 3 k k (@ p2 x))
+               (* k k k (@ p3 x)))
+          y (+ (* (chain *math (pow (- 1 k) 3)) (@ p0 y))
+               (* (chain *math (pow (- 1 k) 2)) 3 k (@ p1 y))
+               (* (- 1 k) 3 k k (@ p2 y))
+               (* k k k (@ p3 y)))))
+  p-final)
+
+(defun multicurve (points context)
+  (let ((num-points (@ points length)))
+    (chain context (move-to (@ (aref points 0) x) (@ (aref points 0) y)))
+    (do ((i 1 (1+ i)))
+        ((>= i (- num-points 2)))
+      (let* ((p0 (aref points i))
+             (p1 (aref points (1+ i)))
+             (midx (/ (+ (@ p0 x) (@ p1 x)) 2))
+             (midy (/ (+ (@ p0 y) (@ p1 y)) 2)))
+        (chain context (quadratic-curve-to (@ p0 x) (@ p0 y) midx midy))))
+    (let ((p0 (aref points (- num-points 2)))
+          (p1 (aref points (- num-points 1))))
+      (chain context (quadratic-curve-to
+                      (@ p0 x)
+                      (@ p0 y)
+                      (@ p1 x)
+                      (@ p1 y))))))
+
+(exports norm lerp map clamp distance distance-xy angle-between
+         circle-collision circle-point-collision
+         point-in-rect in-range range-intersect rect-intersect
+         degree->rad rad->degree
+         random-range random-int
+         quadratic-bezier cubic-bezier multicurve)

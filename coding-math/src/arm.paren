@@ -1,0 +1,77 @@
+(defun make-arm (length center-angle rotation-range phase-offset)
+  (create x 0
+          y 0
+          length length
+          angle 0
+          center-angle center-angle
+          rotation-range rotation-range
+          parent null
+          phase-offset phase-offset))
+
+(defun arm-end-x (arm)
+  (with-slots (x angle length parent) arm
+    (let ((angle angle)
+          (parent parent))
+      (do ()
+          ((null parent) (+ x (* (cos angle) length)))
+        (incf angle (@ parent angle))
+        (setf parent (@ parent parent))))))
+
+(defun arm-end-y (arm)
+  (with-slots (y angle length parent) arm
+    (let ((angle angle)
+          (parent parent))
+      (do ()
+          ((null parent) (+ y (* (sin angle) length)))
+        (incf angle (@ parent angle))
+        (setf parent (@ parent parent))))))
+
+(defsetf arm-phase (arm) (phase)
+  `(with-slots (angle center-angle rotation-range phase-offset) ,arm
+     (setf angle (+ center-angle (* (sin (+ phase phase-offset)) rotation-range)))))
+
+(defmacro arm-x (arm)
+  `(@ ,arm x))
+
+(defsetf arm-x (arm) (value)
+  `(setf (@ ,arm x) ,value))
+
+(defmacro arm-y (arm)
+  `(@ ,arm y))
+
+(defsetf arm-y (arm) (value)
+  `(setf (@ ,arm y) ,value))
+
+(defmacro arm-length (arm)
+  `(@ ,arm length))
+
+(defsetf arm-length (arm) (value)
+  `(setf (@ ,arm length) ,value))
+
+(defmacro arm-angle (arm)
+  `(@ ,arm angle))
+
+(defsetf arm-angle (arm) (value)
+  `(setf (@ ,arm angle) ,value))
+
+(defmacro arm-parent (arm)
+  `(@ ,arm parent))
+
+(defsetf arm-parent (arm) (value)
+  `(setf (@ ,arm parent) ,value))
+
+(defsetf arm-point-at (arm) (point)
+  `(with-slots (x y angle) ,arm
+     (let ((dx (- (@ ,point x) x))
+           (dy (- (@ ,point y) y)))
+       (setf angle (chain *math (atan2 dy dx))))))
+
+(defun drag-arm (arm x y)
+  (with-slots (angle length parent) arm
+    (setf (arm-point-at arm) (create x x y y)
+          (arm-x arm) (- x (* (cos angle) length))
+          (arm-y arm) (- y (* (sin angle) length)))
+    (when parent
+      (drag-arm parent (arm-x arm) (arm-y arm)))))
+
+(exports make-arm arm-end-x arm-end-y drag-arm)

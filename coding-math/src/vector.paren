@@ -1,0 +1,64 @@
+(defun make-vector (&optional (x 0) (y 0))
+  (create x x y y))
+
+(defmacro vec-x (vec)
+  `(@ ,vec x))
+
+(defsetf vec-x (vec) (value)
+  `(setf (@ ,vec x) ,value))
+
+(defmacro vec-y (vec)
+  `(@ ,vec y))
+
+(defsetf vec-y (vec) (value)
+  `(setf (@ ,vec y) ,value))
+
+(defun vec-angle (vec)
+  (chain *math (atan2 (vec-y vec) (vec-x vec))))
+
+(defsetf vec-angle (vec) (angle)
+  `(let ((length (vec-length ,vec)))
+     (setf (vec-x ,vec) (* (cos ,angle) length)
+           (vec-y ,vec) (* (sin ,angle) length))))
+
+(defun vec-length (vec)
+  (with-slots (x y) vec
+    (sqrt (+ (* x x) (* y y)))))
+
+(defsetf vec-length (vec) (length)
+  `(let ((angle (vec-angle ,vec)))
+     (setf (vec-x ,vec) (* (cos angle) ,length)
+           (vec-y ,vec) (* (sin angle) ,length))))
+
+(defun v+ (v1 v2)
+  (make-vector (+ (vec-x v1) (vec-x v2))
+               (+ (vec-y v1) (vec-y v2))))
+
+(defun v- (v1 v2)
+  (make-vector (- (vec-x v1) (vec-x v2))
+               (- (vec-y v1) (vec-y v2))))
+
+(defun v* (v scalar)
+  (make-vector (* (vec-x v) scalar)
+               (* (vec-y v) scalar)))
+
+(defun v/ (v scalar)
+  (v* v (/ 1 scalar)))
+
+(defun v+! (v1 v2)
+  (incf (vec-x v1) (vec-x v2))
+  (incf (vec-y v1) (vec-y v2)))
+
+(defun v-! (v1 v2)
+  (decf (vec-x v1) (vec-x v2))
+  (decf (vec-y v1) (vec-y v2)))
+
+(defun v*! (v scalar)
+  (setf (vec-x v) (* (vec-x v) scalar)
+        (vec-y v) (* (vec-y v) scalar)))
+
+(defun v/! (v scalar)
+  (v*! v (/ 1 scalar)))
+
+(exports make-vector vec-angle vec-length
+         v+ v- v* v/ v+! v-! v*! v/!)

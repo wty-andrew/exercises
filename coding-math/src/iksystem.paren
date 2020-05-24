@@ -1,0 +1,31 @@
+(defun make-ik-system (x y)
+  (create arms (array)
+          last-arm null
+          x x
+          y y))
+
+(defun ik-system-add-arm! (ik-system length)
+  (let ((arm (make-arm length 0 0 0)))
+    (with-slots (arms last-arm) ik-system
+      (with-slots (x y parent) arm
+        (if last-arm
+          (setf x (arm-end-x last-arm)
+                y (arm-end-y last-arm)
+                parent last-arm)
+          (setf x (@ ik-system x)
+                y (@ ik-system y))))
+      (chain arms (push arm))
+      (setf last-arm arm))))
+
+(defun ik-system-reach (ik-system x y)
+  (with-slots (arms last-arm) ik-system
+    (drag-arm last-arm x y)
+    (dolist (arm arms)
+      (with-slots (parent) arm
+        (if parent
+            (setf (@ arm x) (+ (@ parent x) (* (cos (@ parent angle)) (@ parent length)))
+                  (@ arm y) (+ (@ parent y) (* (sin (@ parent angle)) (@ parent length))))
+            (setf (@ arm x) (@ ik-system x)
+                  (@ arm y) (@ ik-system y)))))))
+
+(exports make-ik-system ik-system-add-arm! ik-system-reach)

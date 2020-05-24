@@ -1,0 +1,124 @@
+(defun make-particle (x y speed direction &optional (gravity 0))
+  (create x x
+          y y
+          vx (* (cos direction) speed)
+          vy (* (sin direction) speed)
+          mass 1
+          radius 0
+          bounce -1
+          friction 1
+          gravity gravity
+          springs []
+          gravitations []))
+
+(defmacro particle-x (p)
+  `(@ ,p x))
+
+(defmacro particle-y (p)
+  `(@ ,p y))
+
+(defmacro particle-vx (p)
+  `(@ ,p vx))
+
+(defmacro particle-vy (p)
+  `(@ ,p vy))
+
+(defmacro particle-mass (p)
+  `(@ ,p mass))
+
+(defmacro particle-radius (p)
+  `(@ ,p radius))
+
+(defmacro particle-bounce (p)
+  `(@ ,p bounce))
+
+(defmacro particle-grav (p)
+  `(@ ,p gravity))
+
+(defmacro particle-friction (p)
+  `(@ ,p friction))
+
+(defmacro particle-springs (p)
+  `(@ ,p springs))
+
+(defmacro particle-gravitations (p)
+  `(@ ,p gravitations))
+
+(defun particle-speed (p)
+  (with-slots (vx vy) p
+    (sqrt (+ (* vx vx) (* vy vy)))))
+
+(defsetf particle-speed (p) (speed)
+  `(let ((heading (particle-heading ,p)))
+     (setf (particle-vx ,p) (* (cos heading) ,speed)
+           (particle-vy ,p) (* (sin heading) ,speed))))
+
+(defun particle-heading (p)
+  (chain *math (atan2 (particle-vx p) (particle-vy p))))
+
+(defsetf particle-heading (p) (heading)
+  `(let ((speed (particle-speed ,p)))
+     (setf (particle-vx ,p) (* (cos ,heading) speed)
+           (particle-vy ,p) (* (sin ,heading) speed))))
+
+(defun particle-accelerate! (p accel)
+  (incf (particle-vx p) (vec-x accel))
+  (incf (particle-vy p) (vec-y accel)))
+
+(defun particle-gravitate-to! (self target)
+  (let* ((dx (- (particle-x target) (particle-x self)))
+         (dy (- (particle-y target) (particle-y self)))
+         (dist-sq (+ (* dx dx) (* dy dy)))
+         (dist (sqrt dist-sq))
+         (force (/ (particle-mass target) dist-sq))
+         (ax (* (/ dx dist) force))
+         (ay (* (/ dy dist) force)))
+    (incf (particle-vx self) ax)
+    (incf (particle-vy self) ay)))
+
+(defun particle-gravitation-add! (self p)
+  (particle-gravitation-remove! self p)
+  (chain (particle-gravitations self) (push p)))
+
+(defun particle-gravitation-remove! (self p)
+  (dotimes (i (@ (particle-gravitations self) length))
+    (when (eq p (aref (particle-gravitations self) i))
+      (chain (particle-gravitations self) (splice i 1)))))
+
+(defun particle-spring-to! (self target k &optional (length 0))
+  (let* ((dx (- (@ target x) (particle-x self)))
+         (dy (- (@ target y) (particle-y self)))
+         (distance (sqrt (+ (* dx dx) (* dy dy))))
+         (spring-force (* (- distance length) k))
+         (ax (* (/ dx distance) spring-force))
+         (ay (* (/ dy distance) spring-force)))
+    (incf (particle-vx self) ax)
+    (incf (particle-vy self) ay)))
+
+(defun particle-spring-add! (self point k &optional (length 0))
+  (particle-spring-remove! self point)
+  (chain (particle-springs self) (push (create point point
+                                               k k
+                                               length length))))
+
+(defun particle-spring-remove! (self point)
+  (dotimes (i (@ (particle-springs self) length))
+    (when (eq point (aref (particle-springs self) i))
+      (chain (particle-springs self) (splice i 1)))))
+
+(defun particle-update! (p)
+  (with-slots (x y vx vy gravity friction springs gravitations) p
+    (dolist (spring springs)
+      (with-slots (point k length) spring
+        (particle-spring-to! p point k length)))
+    (dolist (target gravitations)
+      (particle-gravitate-to! p target))
+    (setf vx (* vx friction)
+          vy (+ (* vy friction) gravity)
+          x (+ x vx)
+          y (+ y vy))))
+
+(exports make-particle particle-speed particle-heading
+         particle-update! particle-accelerate!
+         particle-gravitate-to! particle-gravitation-add! particle-gravitation-remove!
+         particle-spring-to! particle-spring-add! particle-spring-remove!)
