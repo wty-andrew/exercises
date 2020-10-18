@@ -5,7 +5,8 @@
            #:puzzle-file->lines
            #:puzzle-file->forms
            #:str->form
-           #:match))
+           #:match
+           #:hash-table-keys))
 
 (in-package #:advent-of-code/utils)
 
@@ -45,3 +46,8 @@
                (values (acons (car pattern) (car sequence) binds2) t)
                (values nil nil))))
         (t (values nil nil))))
+
+(defun hash-table-keys (hash-table)
+  "Return the keys of hash-table as a list."
+  (loop for key being the hash-keys of hash-table
+        collect key))
