@@ -6,7 +6,16 @@
            #:puzzle-file->forms
            #:str->form
            #:match
-           #:hash-table-keys))
+           #:hash-table-keys
+           #:hash-table-values
+           #:permutations
+           #:with-props
+           #:positions
+           #:find-best
+           #:make-graph
+           #:add-edge
+           #:graph-vertices
+           #:weight))
 
 (in-package #:advent-of-code/utils)
 
@@ -51,3 +60,63 @@
   "Return the keys of hash-table as a list."
   (loop for key being the hash-keys of hash-table
         collect key))
+
+(defun hash-table-values (hash-table)
+  "Return the values of hash-table as a list."
+  (loop for value being the hash-value of hash-table
+        collect value))
+
+(defun permutations (items)
+  "Return all the possible ways that a list of items can be arranged."
+  (cond ((null items) nil)
+        ((null (cdr items)) (list items))
+        (t (mapcan (lambda (item)
+                     (mapcar (lambda (p) (cons item p))
+                             (permutations (remove item items))))
+                   items))))
+
+(defmacro with-props (props symbol &body body)
+  "A helper macro for asscessing plist of a symbol."
+  (let ((gsym (gensym)))
+    `(let ((,gsym ,symbol))
+       (symbol-macrolet ,(mapcar (lambda (prop)
+                                   `(,prop (get ,gsym ',prop)))
+                          props)
+         ,@body))))
+
+(defun positions (target sequence &key (test #'equal))
+  "Return the indices of target in sequence."
+  (let ((result nil))
+    (dotimes (i (length sequence) (nreverse result))
+      (if (funcall test (elt sequence i) target)
+          (push i result)))))
+
+(defun find-best (fn sequence)
+  "Mapping a function to sequence, find the item that produce the largest value, return
+both the item and the value."
+  (let ((best-item (first sequence))
+        (best-val (funcall fn (first sequence))))
+    (dolist (item (rest sequence))
+      (let ((val (funcall fn item)))
+        (when (> val best-val)
+          (setf best-val val
+                best-item item))))
+    (values best-item best-val)))
+
+;;; Graph with adjacent list representation. Each key-value pair in the graph
+;;; is a vertex and its connecting vertices with weight stored in a-list.
+(defun make-graph ()
+  "Create an empty graph."
+  (make-hash-table))
+
+(defun add-edge (graph vertex1 vertex2 &optional (weight 0))
+  "Adding an edge connecting vertex1 and vertex2 to the graph."
+  (push (cons vertex2 weight) (gethash vertex1 graph)))
+
+(defun graph-vertices (graph)
+  "Return all vertices in the graph."
+  (hash-table-keys graph))
+
+(defun weight (graph vertex1 vertex2)
+  "Lookup the weight between vertex1 and vertex2 in the graph."
+  (cdr (assoc vertex2 (gethash vertex1 graph))))

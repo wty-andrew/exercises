@@ -8,7 +8,7 @@
 
 (defun build-graph ()
   (let ((forms (puzzle-file->forms "2015/data/09.txt"))
-        (graph (make-hash-table)))
+        (graph (make-graph)))
     (dolist (form forms)
       (destructuring-bind (from to distance)
           (mapcar #'cdr (match '(?from to ?to = ?dist) form))
@@ -16,24 +16,8 @@
         (add-edge graph to from distance)))
     graph))
 
-(defun add-edge (graph vertex1 vertex2 weight)
-  (multiple-value-bind (neighbor-vertices present-p)
-      (gethash vertex1 graph)
-    (if present-p
-        (setf (gethash vertex2 neighbor-vertices) weight)
-        (setf (gethash vertex1 graph) (make-hash-table)
-              (gethash vertex2 (gethash vertex1 graph)) weight))))
-
-(defun permutations (items)
-  (cond ((null items) nil)
-        ((null (cdr items)) (list items))
-        (t (mapcan (lambda (item)
-                     (mapcar (lambda (p) (cons item p))
-                             (permutations (remove item items))))
-                   items))))
-
 (defun distance (city1 city2)
-  (gethash city2 (gethash city1 *graph*)))
+  (weight *graph* city1 city2))
 
 (defun route-cost (route)
   "Return the total distance of the route, a route is a list of cities."
@@ -43,12 +27,12 @@
 
 (defun day-09/p1 ()
   (let* ((*graph* (build-graph))
-         (cities (hash-table-keys *graph*))
+         (cities (graph-vertices *graph*))
          (routes (permutations cities)))
     (apply #'min (mapcar #'route-cost routes))))
 
 (defun day-09/p2 ()
   (let* ((*graph* (build-graph))
-         (cities (hash-table-keys *graph*))
+         (cities (graph-vertices *graph*))
          (routes (permutations cities)))
     (apply #'max (mapcar #'route-cost routes))))
