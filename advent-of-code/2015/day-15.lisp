@@ -6,9 +6,6 @@
 
 (defparameter *properties* '(capacity durability flavor texture calories))
 
-(defun remove-chars (string chars)
-  (remove-if (lambda (c) (member c chars)) string))
-
 (defun parse-ingredient (line)
   "Store the properties of an ingredient inside plist."
   (let* ((form (str->form (remove-chars line '(#\: #\,))))

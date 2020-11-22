@@ -5,6 +5,7 @@
            #:puzzle-file->lines
            #:puzzle-file->forms
            #:str->form
+           #:remove-chars
            #:match
            #:hash-table-keys
            #:hash-table-values
@@ -38,6 +39,10 @@
 (defun puzzle-file->forms (path)
   "Read the puzzle input file into a list of forms."
   (mapcar #'str->form (puzzle-file->lines path)))
+
+(defun remove-chars (string chars)
+  "Return a new string without chars in it."
+  (remove-if (lambda (c) (member c chars)) string))
 
 (defun variable-p (x)
   "Check if the argument is a symbol starts with a question mark."
