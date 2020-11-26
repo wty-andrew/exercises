@@ -19,4 +19,7 @@
   (:use-reexport #:advent-of-code/2015/day-16)
   (:use-reexport #:advent-of-code/2015/day-17)
   (:use-reexport #:advent-of-code/2015/day-18)
-  (:use-reexport #:advent-of-code/2015/day-19))
+  (:use-reexport #:advent-of-code/2015/day-19)
+  (:use-reexport #:advent-of-code/2015/day-20)
+  (:use-reexport #:advent-of-code/2015/day-21)
+  (:use-reexport #:advent-of-code/2015/day-22))

@@ -10,6 +10,7 @@
            #:hash-table-keys
            #:hash-table-values
            #:permutations
+           #:product
            #:with-props
            #:positions
            #:find-best
@@ -79,6 +80,16 @@
                      (mapcar (lambda (p) (cons item p))
                              (permutations (remove item items))))
                    items))))
+
+(defun product (&rest lists)
+  "Return all the possible ways to choose one item from each list."
+  (if (null lists)
+      (list nil)
+      (mapcan (lambda (lst)
+                (mapcar (lambda (x)
+                          (cons x lst))
+                        (car lists)))
+              (apply #'product (cdr lists)))))
 
 (defmacro with-props (props symbol &body body)
   "A helper macro for asscessing plist of a symbol."
