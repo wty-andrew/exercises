@@ -8,4 +8,5 @@
   (:use-reexport #:advent-of-code/2020/day-05)
   (:use-reexport #:advent-of-code/2020/day-06)
   (:use-reexport #:advent-of-code/2020/day-07)
-  (:use-reexport #:advent-of-code/2020/day-08))
+  (:use-reexport #:advent-of-code/2020/day-08)
+  (:use-reexport #:advent-of-code/2020/day-09))
