@@ -107,14 +107,14 @@
       (if (funcall test (elt sequence i) target)
           (push i result)))))
 
-(defun find-best (fn sequence)
-  "Mapping a function to sequence, find the item that produce the largest value, return
+(defun find-best (fn sequence &key (comparator #'>))
+  "Mapping a function to sequence, find the item that produce the best value, return
 both the item and the value."
   (let ((best-item (first sequence))
         (best-val (funcall fn (first sequence))))
     (dolist (item (rest sequence))
       (let ((val (funcall fn item)))
-        (when (> val best-val)
+        (when (funcall comparator val best-val)
           (setf best-val val
                 best-item item))))
     (values best-item best-val)))
