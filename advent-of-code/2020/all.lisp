@@ -14,4 +14,5 @@
   (:use-reexport #:advent-of-code/2020/day-11)
   (:use-reexport #:advent-of-code/2020/day-12)
   (:use-reexport #:advent-of-code/2020/day-13)
-  (:use-reexport #:advent-of-code/2020/day-14))
+  (:use-reexport #:advent-of-code/2020/day-14)
+  (:use-reexport #:advent-of-code/2020/day-15))
