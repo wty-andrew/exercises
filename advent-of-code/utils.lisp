@@ -14,6 +14,7 @@
            #:with-props
            #:positions
            #:find-best
+           #:separate-by
            #:make-graph
            #:add-edge
            #:graph-vertices
@@ -118,6 +119,15 @@ both the item and the value."
           (setf best-val val
                 best-item item))))
     (values best-item best-val)))
+
+(defun separate-by (pred sequence)
+  "Separate the items in given sequence into two list by the predicate function."
+  (loop for item in sequence
+        if (funcall pred item)
+          collect item into good
+        else
+          collect item into bad
+        finally (return (values good bad))))
 
 ;;; Graph with adjacent list representation. Each key-value pair in the graph
 ;;; is a vertex and its connecting vertices with weight stored in a-list.
