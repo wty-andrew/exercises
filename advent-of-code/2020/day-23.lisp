@@ -1,0 +1,57 @@
+(uiop:define-package #:advent-of-code/2020/day-23
+  (:use #:cl #:aoc-utils)
+  (:export #:day-23/p1 #:day-23/p2))
+
+(in-package #:advent-of-code/2020/day-23)
+
+(defun play! (cups start rounds)
+  (macrolet ((next (target) `(gethash ,target cups)))
+    (labels ((move (target)
+               (let* ((pick1 (next target))
+                      (pick2 (next pick1))
+                      (pick3 (next pick2))
+                      (dest (or (loop for i from (1- target) downto 1
+                                      when (not (member i (list pick1 pick2 pick3)))
+                                        do (return i))
+                                (loop for i from (hash-table-count cups) downto 1
+                                      when (not (member i (list pick1 pick2 pick3 target)))
+                                        do (return i)))))
+                 (setf (next target) (next pick3)
+                       (next pick3) (next dest)
+                       (next dest) pick1))))
+      (let ((dest start))
+        (dotimes (_ rounds)
+          (declare (ignorable _))
+          (move dest)
+          (setf dest (next dest)))))))
+
+(defun read-cup-labeling ()
+  (list 1 9 3 4 6 7 2 5 8))
+
+(defun day-23/p1 ()
+  (let ((cups (make-hash-table))
+        (results nil))
+    (destructuring-bind (first . rest) (read-cup-labeling)
+      (loop for head in (cons first rest)
+            for tail in (append rest (list first))
+            do (setf (gethash head cups) tail))
+      (play! cups first 100))
+    (do ((current (gethash 1 cups) (gethash current cups)))
+        ((= current 1) (parse-integer (map 'string #'digit-char (reverse results))))
+      (push current results))))
+
+(defun day-23/p2 ()
+  (let ((cups (make-hash-table))
+        (num-cups 1000000)
+        (init-labels (read-cup-labeling)))
+    (loop for head in init-labels
+          for tail in (cdr init-labels)
+          do (setf (gethash head cups) tail))
+    (setf (gethash (car (last init-labels)) cups) (1+ (length init-labels)))
+    (loop for i from (1+ (length init-labels)) below num-cups
+          do (setf (gethash i cups) (1+ i)))
+    (setf (gethash num-cups cups) (car init-labels))
+    (play! cups (car init-labels) 10000000)
+    (let* ((n1 (gethash 1 cups))
+           (n2 (gethash n1 cups)))
+      (* n1 n2))))
