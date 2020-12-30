@@ -20,6 +20,8 @@
   (:use-reexport #:advent-of-code/2020/day-17)
   (:use-reexport #:advent-of-code/2020/day-18)
   (:use-reexport #:advent-of-code/2020/day-19)
+  (:use-reexport #:advent-of-code/2020/day-20)
+  (:use-reexport #:advent-of-code/2020/day-21)
   (:use-reexport #:advent-of-code/2020/day-22)
   (:use-reexport #:advent-of-code/2020/day-23)
   (:use-reexport #:advent-of-code/2020/day-24)

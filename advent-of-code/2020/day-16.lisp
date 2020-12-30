@@ -39,18 +39,9 @@
   (loop for (lower1 upper1 lower2 upper2) in ranges-list
         never (or (<= lower1 value upper1) (<= lower2 value upper2))))
 
-(defun back-track (variables values var-candidates)
-  (labels ((rec (assignments)
-             (multiple-value-bind (assigned unassigned) (separate-by #'cdr assignments)
-               (let ((var (caar unassigned))
-                     (unassigned-values (set-difference values (mapcar #'cdr assigned))))
-                 (unless unassigned
-                   (return-from back-track assignments))
-                 (dolist (value (intersection (funcall var-candidates var) unassigned-values))
-                   (let ((copy (copy-tree assignments)))
-                     (setf (cdr (assoc var copy)) value)
-                     (rec copy)))))))
-    (rec (mapcar #'list variables))))
+(defun in-bound-p (ranges value)
+  (destructuring-bind (l1 h1 l2 h2) ranges
+    (or (<= l1 value h1) (<= l2 value h2))))
 
 (defun day-16/p1 ()
   (multiple-value-bind (rules own-ticket nearby-tickets) (read-puzzle)
@@ -69,20 +60,24 @@
                                  (loop for value in ticket
                                          thereis (invalid-p ranges-list value)))
                                nearby-tickets))
-           (constraints nil))
-      (flet ((in-bound (ranges value)
-               (destructuring-bind (l1 h1 l2 h2) ranges
-                 (or (<= l1 value h1) (<= l2 value h2)))))
-        (dolist (field fields)
-          (let* ((ranges (gethash field rules))
-                 (values (loop for i below (length fields)
-                               when (every (lambda (ticket) (in-bound ranges (nth i ticket))) tickets)
+           (domains (make-hash-table)))
+      (dolist (field fields)
+        (let* ((ranges (gethash field rules))
+               (values (loop for i below (length fields)
+                             when (every (lambda (ticket)
+                                           (in-bound-p ranges (nth i ticket)))
+                                         tickets)
                                  collect i)))
-            (push (cons field values) constraints)))
-        (setf constraints (sort constraints #'< :key (lambda (c) (length (cdr c)))))
-        (let ((assignments (back-track (mapcar #'car constraints)
-                                       (loop for i below (length fields) collect i)
-                                       (lambda (field) (cdr (assoc field constraints))))))
-          (reduce #'* (loop for (field . idx) in assignments
+          (setf (gethash field domains) values)))
+      (labels ((candidates (field) (gethash field domains))
+               (no-duplicates-p (lst) (equal (remove-duplicates lst) lst))
+               (constraint-check (field assignments)
+                 (declare (ignore field))
+                 (no-duplicates-p (hash-table-values assignments))))
+        (let* ((sorted-variables (sort (hash-table-keys domains) #'<
+                                       :key (lambda (field) (length (candidates field)))))
+               (assignments (csp-backtracking sorted-variables #'candidates #'constraint-check)))
+          (reduce #'* (loop for field being the hash-keys of assignments
+                              using (hash-value idx)
                             when (search "DEPARTURE" (string field))
                               collect (nth idx own-ticket))))))))

@@ -15,6 +15,7 @@
            #:positions
            #:find-best
            #:separate-by
+           #:csp-backtracking
            #:make-graph
            #:add-edge
            #:graph-vertices
@@ -128,6 +129,25 @@ both the item and the value."
         else
           collect item into bad
         finally (return (values good bad))))
+
+(defun csp-backtracking (variables var-candidates-fn constraint-check-fn)
+  "Solve constraint satisfaction problems with backtracking, returns a hash-table if a
+solution is found."
+  (labels ((rec (assignments)
+             (let* ((assigned-vars (hash-table-keys assignments))
+                    (unassigned-vars (loop for var in variables
+                                           when (not (member var assigned-vars))
+                                             collect var)))
+               (if unassigned-vars
+                   (let ((var (car unassigned-vars)))
+                     (dolist (value (funcall var-candidates-fn var))
+                       (setf (gethash var assignments) value)
+                       (when (and (funcall constraint-check-fn var assignments)
+                                  (rec assignments))
+                         (return-from rec assignments))
+                       (remhash var assignments)))
+                   assignments))))
+    (rec (make-hash-table))))
 
 ;;; Graph with adjacent list representation. Each key-value pair in the graph
 ;;; is a vertex and its connecting vertices with weight stored in a-list.
