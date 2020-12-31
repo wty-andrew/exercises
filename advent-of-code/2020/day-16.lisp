@@ -35,13 +35,13 @@
       (read-nearby-tickets (read-own-ticket (read-rules lines)))
       (values rules own-ticket nearby-tickets))))
 
-(defun invalid-p (ranges-list value)
-  (loop for (lower1 upper1 lower2 upper2) in ranges-list
-        never (or (<= lower1 value upper1) (<= lower2 value upper2))))
-
 (defun in-bound-p (ranges value)
   (destructuring-bind (l1 h1 l2 h2) ranges
     (or (<= l1 value h1) (<= l2 value h2))))
+
+(defun invalid-p (ranges-list value)
+  (loop for ranges in ranges-list
+        never (in-bound-p ranges value)))
 
 (defun day-16/p1 ()
   (multiple-value-bind (rules own-ticket nearby-tickets) (read-puzzle)

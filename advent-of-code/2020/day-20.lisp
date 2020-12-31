@@ -40,14 +40,13 @@
 
 (defparameter *orientations*
   '((0 1 2 3)
-    (7 0 5 2) ; rotate 90
-    (6 7 4 5) ; rotate 180
-    (1 6 3 4) ; rotate 270
-    (2 5 0 7) ; vertical flip
-    (3 2 1 0) ; vertical flip + rotate 90
-    (4 3 6 1) ; vertical flip + rotate 180
-    (5 4 7 6) ; vertical flip + rotate 270
-    ))
+    (7 0 5 2)   ; rotate 90
+    (6 7 4 5)   ; rotate 180
+    (1 6 3 4)   ; rotate 270
+    (2 5 0 7)   ; vertical flip
+    (3 2 1 0)   ; vertical flip + rotate 90
+    (4 3 6 1)   ; vertical flip + rotate 180
+    (5 4 7 6))) ; vertical flip + rotate 270
 
 (defun rotate (array)
   "Return a 90 degrees clockwise rotated array."
@@ -82,46 +81,36 @@
                  (mapcar #'car (sort counter #'> :key #'cdr))))
              (in-bound (x y) (and (<= 0 x (1- size)) (<= 0 y (1- size))))
              (borders (tile-id orientation)
-               (let ((default (gethash tile-id tile->borders)))
-                 (mapcar (lambda (i) (nth i default)) (nth orientation *orientations*))))
-             (constraint (assigments idx)
+               (let ((border-values (gethash tile-id tile->borders)))
+                 (mapcar (lambda (i) (nth i border-values)) (nth orientation *orientations*))))
+             (constraint (idx assignments)
                (multiple-value-bind (y x) (floor idx size)
                  (loop for (dx dy) in '((0 -1) (1 0) (0 1) (-1 0)) ; U R D L
                        for i in '(2 3 0 1) ; D L U R
                        for nbr-x = (+ x dx)
                        for nbr-y = (+ y dy)
-                       collect (when (in-bound nbr-x nbr-y)
+                       collect (when (and (in-bound nbr-x nbr-y) (gethash (+ nbr-x (* nbr-y size)) assignments))
                                  (destructuring-bind (nbr-id . nbr-orientation)
-                                     (aref assigments (+ nbr-x (* nbr-y size)))
+                                     (gethash (+ nbr-x (* nbr-y size)) assignments)
                                    (and nbr-id (nth i (borders nbr-id nbr-orientation))))))))
              (match-constraint (constraint borders)
                (loop for c in constraint
                      for b in borders
-                     always (or (null c) (= c b))))
-             (find-candidates (assignments constraint)
-               (let* ((assigned-tiles (loop for (tile-id . orientation) across assignments
-                                            while tile-id
-                                            collect tile-id))
-                      (tile-candidates (remove-duplicates (apply #'append (mapcar (lambda (id)
-                                                                                    (gethash id border->tiles))
-                                                                                  (remove nil constraint))))))
-                 (loop for tile-id in (set-difference tile-candidates assigned-tiles)
-                       nconc (loop for orientation below 8
-                                   when (match-constraint constraint (borders tile-id orientation))
-                                     collect (cons tile-id orientation)))))
-             (solve (assignments index)
-               (let ((candidates (find-candidates assignments (constraint assignments index))))
-                 (dolist (candidate candidates)
-                   (let ((copy (copy-seq assignments)))
-                     (setf (svref copy index) candidate)
-                     (if (= index (1- (* size size)))
-                         (return-from solve-puzzle copy)
-                         (solve copy (1+ index))))))))
-      (dolist (tile-id (tiles-sort-by-constraint))
-        (dotimes (orientation 8)
-          (let ((assignments (make-array (* size size) :initial-element (cons nil nil))))
-            (setf (svref assignments 0) (cons tile-id orientation))
-            (solve assignments 1)))))))
+                     always (or (null c) (= c b)))))
+      (let ((variables (loop for i below (* size size)
+                             collect i))
+            (values (loop for tile-id in (tiles-sort-by-constraint)
+                          nconc (loop for orientation below 8
+                                      collect (cons tile-id orientation)))))
+        (csp-backtracking variables
+                          (lambda (var)
+                            (declare (ignore var))
+                            values)
+                          (lambda (idx assignments)
+                            (destructuring-bind (tile-id . orientation) (gethash idx assignments)
+                              (and (= (count tile-id (mapcar #'car (hash-table-values assignments))) 1)
+                                   (match-constraint (constraint idx assignments)
+                                                     (borders tile-id orientation))))))))))
 
 (defun put-together (tiles)
   (let ((size (isqrt (length tiles))))
@@ -153,15 +142,18 @@
 (defun day-20/p1 ()
   (multiple-value-bind (border->tiles tile->borders _) (read-tiles)
     (declare (ignore _))
+    (solve-puzzle border->tiles tile->borders)
     (let* ((assignments (solve-puzzle border->tiles tile->borders))
-           (size (isqrt (length assignments))))
-      (apply #'* (mapcar (lambda (i) (car (svref assignments i)))
+           (size (isqrt (hash-table-count tile->borders))))
+      (apply #'* (mapcar (lambda (i) (car (gethash i assignments)))
                          (list 0 (1- size) (* size (1- size)) (1- (* size size))))))))
 
 (defun day-20/p2 ()
   (multiple-value-bind (border->tiles tile->borders tile-table) (read-tiles)
     (let* ((assignments (solve-puzzle border->tiles tile->borders))
-           (tiles (loop for (tile-id . orientation) across assignments
+           (size (isqrt (hash-table-count tile->borders)))
+           (tiles (loop for i below (* size size)
+                        for (tile-id . orientation) = (gethash i assignments)
                         collect (orient-array (gethash tile-id tile-table) orientation)))
            (image (put-together tiles))
            (pattern #2A((0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0)

@@ -4,16 +4,17 @@
 
 (in-package #:advent-of-code/2020/day-24)
 
-(defstruct (coordinate (:constructor make-coordinate (x y))
-                       (:conc-name coord-)
-                       (:type vector))
-  (x 0 :type integer)
-  (y 0 :type integer))
+(defun make-coordinate (x y)
+  (vector x y))
+
+(defun x (vec)
+  (svref vec 0))
+
+(defun y (vec)
+  (svref vec 1))
 
 (defun move (coord dx dy)
-  (let ((x (coord-x coord))
-        (y (coord-y coord)))
-    (make-coordinate (+ x dx) (+ y dy))))
+  (make-coordinate (+ (x coord) dx) (+ (y coord) dy)))
 
 (defun move-direction (coord direction)
   (case direction
@@ -59,8 +60,8 @@ if the tile is black or not."
         (min-y most-positive-fixnum)
         (max-y most-negative-fixnum))
     (loop for coord in coords
-          do (let ((x (coord-x coord))
-                   (y (coord-y coord)))
+          do (let ((x (x coord))
+                   (y (y coord)))
                (when (< x min-x)
                  (setf min-x x))
                (when (> x max-x)

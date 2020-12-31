@@ -34,9 +34,6 @@
     (dotimes (i (length str) n)
       (setf n (+ (ash n 1) (digit-char-p (char str i)))))))
 
-(defun int->char (n)
-  (code-char (+ n 48)))
-
 (defun addresses (masked-addr)
   "Return all the possible memory addresses caused by the floating bits."
   (labels ((rec (n)
@@ -49,7 +46,7 @@
                              collect i)))
       (mapcar (lambda (lst)
                 (let ((copy (copy-seq masked-addr)))
-                  (mapc (lambda (i n) (setf (char copy i) (int->char n))) x-indices lst)
+                  (mapc (lambda (i n) (setf (char copy i) (digit-char n))) x-indices lst)
                   (bit-string->int copy)))
               (rec (length x-indices))))))
 

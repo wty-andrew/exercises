@@ -31,7 +31,9 @@
                               using (hash-value allergens)
                             always (or (null (member allergen allergens))
                                        (member ingredient ingredients)))))))
-      (csp-backtracking (hash-table-keys domains) (lambda (var) (gethash var domains)) #'constraint-check))))
+      (csp-backtracking (hash-table-keys domains)
+                        (lambda (var) (gethash var domains))
+                        #'constraint-check))))
 
 (defun day-21/p1 ()
   (let* ((foods (read-foods))
